@@ -43,7 +43,31 @@ def scrape_gog():
 
 def save_to_file(games_by_platform):
     today = datetime.now().strftime("%B %d, %Y")
-    with open('index.html', 'a') as f:
-        f.write(f'<h2>{today}</h2>\n')
+    
+    # Write to index.html file
+    with open('index.html', 'w') as f:  # Overwrite the file instead of appending
+        f.write(f'<html><body>\n')
+        f.write(f'<h1>Free Games for {today}</h1>\n')
+
         for platform, games in games_by_platform.items():
-            f.wr
+            f.write(f'<h2>{platform}</h2>\n')
+            if games:
+                for title, link in games:
+                    f.write(f'<p><a href="{link}">{title}</a></p>\n')
+            else:
+                f.write(f'<p>No free games available on {platform} at this time.</p>\n')
+
+        f.write('</body></html>\n')
+
+if __name__ == "__main__":
+    steam_games = scrape_steam()
+    epic_games = scrape_epic()
+    gog_games = scrape_gog()
+
+    games_by_platform = {
+        "Steam": steam_games,
+        "Epic Games": epic_games,
+        "GOG": gog_games
+    }
+
+    save_to_file(games_by_platform)
