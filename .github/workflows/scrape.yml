@@ -16,7 +16,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.9'
+        python-version: '3.x'
 
     - name: Install dependencies
       run: |
@@ -26,16 +26,12 @@ jobs:
     - name: Run scraper
       run: python scraper.py
 
-    - name: Check for changes
+    - name: Commit and push changes
       run: |
         git config --global user.name 'Your Name'
         git config --global user.email 'you@example.com'
-        git add index.html || true
-        git diff --quiet || git commit -m "Daily update of free games list"
-
-    - name: Push changes if there are any
-      if: success()
-      run: |
+        git add index.html
+        git commit -m "Daily update of free games list"
         git push
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
