@@ -1,13 +1,21 @@
+/* Base Styles */
 body {
     background-color: black;
-    color: green;
-    font-family: monospace;
+    color: #00FF00;
+    font-family: 'Courier New', Courier, monospace;
+    margin: 0;
+    padding: 0;
 }
 
+/* Header Style */
 h1 {
     text-align: center;
+    font-size: 3em;
+    letter-spacing: 2px;
+    animation: fadeIn 1.5s ease-in-out;
 }
 
+/* Game List */
 .game-list {
     margin: 20px;
 }
@@ -15,11 +23,57 @@ h1 {
 .game-list a {
     color: #00FF00;
     text-decoration: none;
+    font-size: 1.2em;
+    transition: color 0.3s ease;
 }
 
+.game-list a:hover {
+    color: #33FF33;
+}
+
+/* Subtle Hover Animations */
+footer p, .game-list a:hover {
+    animation: pulse 0.7s infinite;
+}
+
+/* Footer */
 footer {
     text-align: center;
-    margin-top: 20px;
+    margin-top: 50px;
+    padding: 10px;
+    background-color: #101010;
     color: white;
     font-size: 0.8em;
+}
+
+/* ASCII Art Style */
+.ascii-art {
+    font-size: 1.5em;
+    color: #00FF00;
+    text-align: center;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes pulse {
+    0% { color: #00FF00; }
+    50% { color: #33FF33; }
+    100% { color: #00FF00; }
+}
+
+/* Subtle Background Animation */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('https://your-background-image-url.com') repeat-y center;
+    opacity: 0.05; /* Very faint */
+    z-index: -1;
 }
