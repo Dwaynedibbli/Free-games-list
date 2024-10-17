@@ -8,7 +8,7 @@ def scrape_steam():
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'html.parser')
     games = []
-    
+
     # Debug: Print the HTML of the Steam page
     print("Scraping Steam for discounted games...")
 
@@ -25,7 +25,7 @@ def scrape_steam():
 
             if discount_text == "-100%":
                 games.append((title, link))
-    
+
     # Debug: Print the scraped Steam games
     print(f"Steam games found: {games}")
     
@@ -34,7 +34,7 @@ def scrape_steam():
 # Save the scraped data to the index.html file
 def save_to_file(games_by_platform):
     today = datetime.now().strftime("%B %d, %Y")
-    
+
     # Use UTF-8 encoding to handle special characters
     with open('index.html', 'w', encoding='utf-8') as f:
         f.write('<!DOCTYPE html>\n')
@@ -65,15 +65,3 @@ def save_to_file(games_by_platform):
         f.write(f'        <p>Generated on {today}</p>\n')  # Ensure the date is included
         f.write('    </footer>\n')
         f.write('</body>\n</html>')
-
-# Main function to run the scraper and save the data
-if __name__ == "__main__":
-    steam_games = scrape_steam()
-
-    # Create a dictionary with the platform and the games
-    games_by_platform = {
-        "Steam": steam_games
-    }
-
-    # Save the scraped data to index.html
-    save_to_file(games_by_platform)
