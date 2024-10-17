@@ -7,6 +7,7 @@ def save_to_file(games_by_platform):
     # Debugging: Print the games being passed to save_to_file
     print(f"Saving Steam games: {games_by_platform['Steam']}")
     print(f"Saving GOG games: {games_by_platform['GOG']}")
+    print(f"Saving Epic games: {games_by_platform['Epic']}")  # Add Epic to debugging
 
     with open('index.html', 'w', encoding='utf-8') as f:
         f.write('<!DOCTYPE html>\n')
@@ -33,6 +34,16 @@ def save_to_file(games_by_platform):
         f.write(f'        <h2>GOG</h2>\n')
         if games_by_platform["GOG"]:
             for game in games_by_platform["GOG"]:
+                title = game['title']  # Access the 'title' key from the dictionary
+                link = game['link']    # Access the 'link' key from the dictionary
+                f.write(f'        <a href="{link}">{title}</a><br>\n')
+        else:
+            f.write('        <p>No free games available today.</p>\n')
+
+        # Write Epic games
+        f.write(f'        <h2>Epic Games</h2>\n')
+        if games_by_platform["Epic"]:
+            for game in games_by_platform["Epic"]:
                 title = game['title']  # Access the 'title' key from the dictionary
                 link = game['link']    # Access the 'link' key from the dictionary
                 f.write(f'        <a href="{link}">{title}</a><br>\n')
