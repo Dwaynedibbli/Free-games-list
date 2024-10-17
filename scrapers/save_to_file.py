@@ -25,4 +25,24 @@ def save_to_file(games_by_platform):
             for title, link in games_by_platform["Steam"]:
                 f.write(f'        <a href="{link}">{title}</a><br>\n')
         else:
-            f.write('        <p>No free
+            f.write('        <p>No free games available today.</p>\n')
+
+        # Write GOG games
+        f.write(f'        <h2>GOG</h2>\n')
+        if games_by_platform["GOG"]:
+            for game in games_by_platform["GOG"]:
+                title = game['title']
+                link = game['link']
+                f.write(f'        <a href="{link}">{title}</a><br>\n')
+        else:
+            f.write('        <p>No free games available today.</p>\n')
+
+        f.write('    </div>\n')
+
+        # Include the external legal disclaimer from styles folder
+        f.write('<footer>\n')
+        f.write('    <p><link rel="stylesheet" type="text/css" href="styles/disclaimer.css"></p>\n')  # Linking to disclaimer
+        f.write(f'    <p>Generated on {today}</p>\n')
+        f.write('</footer>\n')
+
+        f.write('</body>\n</html>')
