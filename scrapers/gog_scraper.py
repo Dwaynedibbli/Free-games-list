@@ -43,20 +43,8 @@ def scrape_gog_discounted_free():
 
     return games
 
-# Test these updates for GOG scraping
-def main():
-    gog_always_free_games = scrape_gog_always_free()
-    gog_discounted_free_games = scrape_gog_discounted_free()
-
-    all_free_games = gog_always_free_games + gog_discounted_free_games
-
-    if all_free_games:
-        print(f"Found {len(all_free_games)} free games:")
-        for game in all_free_games:
-            print(f"Title: {game[0]}, Link: {game[1]}")
-    else:
-        print("No free games found.")
-
-# Run the scraper
-if __name__ == '__main__':
-    main()
+# Function to combine both scrapers and return all GOG games
+def scrape_gog():
+    always_free_games = scrape_gog_always_free()
+    discounted_free_games = scrape_gog_discounted_free()
+    return always_free_games + discounted_free_games
