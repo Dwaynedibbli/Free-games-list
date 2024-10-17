@@ -4,7 +4,12 @@ from datetime import datetime
 def save_to_file(games_by_platform):
     today = datetime.now().strftime("%B %d, %Y")
 
-    with open('../index.html', 'w', encoding='utf-8') as f:  # Adjust path to write to root
+    # Debugging: Print the games being passed to save_to_file
+    print(f"Saving Steam games: {games_by_platform['Steam']}")
+    print(f"Saving GOG games: {games_by_platform['GOG']}")
+
+    # Writing to the root folder, adjust the path as needed for your web environment
+    with open('index.html', 'w', encoding='utf-8') as f:
         f.write('<!DOCTYPE html>\n')
         f.write('<html lang="en">\n<head>\n')
         f.write('    <meta charset="UTF-8">\n')
@@ -14,9 +19,6 @@ def save_to_file(games_by_platform):
         f.write('</head>\n<body>\n')
         f.write(f'    <h1>Free Games Today</h1>\n')
         
-        # ASCII Art (Optional)
-        f.write('<div class="ascii-art">╔════════════════════════╗</div>\n')
-
         f.write('    <div class="game-list">\n')
 
         # Write Steam games
@@ -30,18 +32,14 @@ def save_to_file(games_by_platform):
         # Write GOG games
         f.write(f'        <h2>GOG</h2>\n')
         if games_by_platform["GOG"]:
-            for game in games_by_platform["GOG"]:
-                title = game['title']
-                link = game['link']
+            for title, link in games_by_platform["GOG"]:
                 f.write(f'        <a href="{link}">{title}</a><br>\n')
         else:
             f.write('        <p>No free games available today.</p>\n')
 
         f.write('    </div>\n')
 
-        # Include the external legal disclaimer from styles folder
         f.write('<footer>\n')
-        f.write('    <p><link rel="stylesheet" type="text/css" href="styles/disclaimer.css"></p>\n')  # Linking to disclaimer
         f.write(f'    <p>Generated on {today}</p>\n')
         f.write('</footer>\n')
 
