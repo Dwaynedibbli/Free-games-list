@@ -10,16 +10,16 @@ def scrape_gog_always_free():
 
     print("Scraping GOG for always-free games...")
 
-    # Find all game items by looking for 'product-tile' class
-    for item in soup.find_all('div', class_='product-tile'):
-        title = item.find('span', class_='product-title').text
-        link = item.find('a', href=True)['href']
+    # Find all free games by looking for the class that indicates a free game
+    for item in soup.find_all('div', class_='product-state__price-btn price-btn--free'):
+        title = item.find_previous('span', class_='product-title').text
+        link = item.find_previous('a', href=True)['href']
         games.append((title, "https://www.gog.com" + link))
 
     print(f"GOG always-free games found: {games}")
     return games
 
-# Scrape GOG discounted-to-free games (looking for "Free" label)
+# Scrape GOG discounted-to-free games
 def scrape_gog_discounted():
     url = "https://www.gog.com/en/games?priceRange=0,0&discounted=true"
     response = requests.get(url)
@@ -28,15 +28,11 @@ def scrape_gog_discounted():
 
     print("Scraping GOG for discounted-to-free games...")
 
-    # Find all game items by looking for 'product-tile' class
-    for item in soup.find_all('div', class_='product-tile'):
-        title = item.find('span', class_='product-title').text
-        link = item.find('a', href=True)['href']
-        price_tag = item.find('span', class_='final-price')
-        
-        # Check if the price is listed as "Free"
-        if price_tag and price_tag.text.strip().lower() == "free":
-            games.append((title, "https://www.gog.com" + link))
+    # Find all discounted free games by looking for the "Free" label in the product price
+    for item in soup.find_all('span', class_='product-price__free'):
+        title = item.find_previous('span', class_='product-title').text
+        link = item.find_previous('a', href=True)['href']
+        games.append((title, "https://www.gog.com" + link))
 
     print(f"GOG discounted-to-free games found: {games}")
     return games
