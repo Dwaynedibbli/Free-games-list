@@ -15,5 +15,9 @@ if __name__ == "__main__":
         "GOG": gog_games if gog_games else []
     }
 
+    # Debugging: Print the games to ensure they are being captured correctly
+    print(f"Steam games: {games_by_platform['Steam']}")
+    print(f"GOG games: {games_by_platform['GOG']}")
+
     # Save the scraped data to index.html
     save_to_file(games_by_platform)
