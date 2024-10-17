@@ -24,7 +24,8 @@ def save_to_file(games_by_platform):
         # Write Steam games
         f.write(f'        <h2>Steam</h2>\n')
         if games_by_platform["Steam"]:
-            for title, link in games_by_platform["Steam"]:
+            for game in games_by_platform["Steam"]:
+                title, link = game
                 f.write(f'        <a href="{link}">{title}</a><br>\n')
         else:
             f.write('        <p>No free games available today.</p>\n')
@@ -32,7 +33,8 @@ def save_to_file(games_by_platform):
         # Write GOG games
         f.write(f'        <h2>GOG</h2>\n')
         if games_by_platform["GOG"]:
-            for title, link in games_by_platform["GOG"]:
+            for game in games_by_platform["GOG"]:
+                title, link = game
                 f.write(f'        <a href="{link}">{title}</a><br>\n')
         else:
             f.write('        <p>No free games available today.</p>\n')
