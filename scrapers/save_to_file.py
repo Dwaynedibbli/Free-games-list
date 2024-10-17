@@ -4,11 +4,6 @@ from datetime import datetime
 def save_to_file(games_by_platform):
     today = datetime.now().strftime("%B %d, %Y")
 
-    # Debugging: Print the games being passed to save_to_file
-    print(f"Saving Steam games: {games_by_platform['Steam']}")
-    print(f"Saving GOG games: {games_by_platform['GOG']}")
-    print(f"Saving Epic games: {games_by_platform['Epic']}")  # Add Epic to debugging
-
     with open('index.html', 'w', encoding='utf-8') as f:
         f.write('<!DOCTYPE html>\n')
         f.write('<html lang="en">\n<head>\n')
@@ -40,7 +35,7 @@ def save_to_file(games_by_platform):
         else:
             f.write('        <p>No free games available today.</p>\n')
 
-        # Write Epic games
+        # Write Epic Games
         f.write(f'        <h2>Epic Games</h2>\n')
         if games_by_platform["Epic"]:
             for game in games_by_platform["Epic"]:
