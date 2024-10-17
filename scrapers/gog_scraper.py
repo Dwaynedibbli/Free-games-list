@@ -1,23 +1,47 @@
 import requests
 from bs4 import BeautifulSoup
 
-# Scrape GOG free games with 100% discount (originally paid)
-def scrape_gog():
-    url = "https://www.gog.com/games?sort=popularity&price=discounted"
+# Scrape GOG always-free games
+def scrape_gog_always_free():
+    url = "https://www.gog.com/en/partner/free_games"
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'html.parser')
     games = []
 
-    print("Scraping GOG for 100% discounted games...")
+    print("Scraping GOG for always-free games...")
 
+    # Find all game items by looking for 'product-tile' class or similar
     for item in soup.find_all('div', class_='product-tile'):
         title = item.find('span', class_='product-title').text
         link = item.find('a', href=True)['href']
-        discount_tag = item.find('span', class_='discount-tag')
+        games.append((title, "https://www.gog.com" + link))
 
-        if discount_tag is not None and discount_tag.text.strip() == "-100%":
-            games.append((title, "https://www.gog.com" + link))
-
-    print(f"GOG games found: {games}")
-    
+    print(f"GOG always-free games found: {games}")
     return games
+
+# Scrape GOG discounted-to-free games
+def scrape_gog_discounted():
+    url = "https://www.gog.com/en/games?priceRange=0,0&discounted=true"
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    games = []
+
+    print("Scraping GOG for discounted-to-free games...")
+
+    # Find all game items by looking for 'product-tile' class
+    for item in soup.find_all('div', class_='product-tile'):
+        title = item.find('span', class_='product-title').text
+        link = item.find('a', href=True)['href']
+        games.append((title, "https://www.gog.com" + link))
+
+    print(f"GOG discounted-to-free games found: {games}")
+    return games
+
+# Combined function to return both lists
+def scrape_gog():
+    always_free_games = scrape_gog_always_free()
+    discounted_free_games = scrape_gog_discounted()
+
+    # Combine the two lists of games
+    all_gog_games = always_free_games + discounted_free_games
+    return all_gog_games
