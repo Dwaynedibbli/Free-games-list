@@ -6,7 +6,7 @@ def scrape_gog_always_free():
     url = 'https://www.gog.com/en/partner/free_games'
     response = requests.get(url)
     soup = BeautifulSoup(response.content, 'html.parser')
-    
+
     games = []
 
     # Find all game containers where the price is marked as free
@@ -14,17 +14,10 @@ def scrape_gog_always_free():
 
     for game in game_containers:
         title = game.find('span', class_='product-title__text').text.strip()  # Extract game title
-        price_free = game.find('span', class_='product-state__is-free')
+        link = game.find('a', class_='product-row__link')['href']
+        full_link = f"https://www.gog.com{link}"
 
-        if price_free:
-            link = game.find('a', class_='product-row__link')['href']
-            full_link = f"https://www.gog.com{link}"
-
-            games.append({
-                'title': title,
-                'link': full_link,
-                'price': 'Free'
-            })
+        games.append((title, full_link))  # Match format to Steam scraper
 
     return games
 
@@ -38,27 +31,32 @@ def scrape_gog_discounted_free():
 
     # Find all game containers with free price
     game_tiles = soup.find_all('a', class_='product-tile')
-
+    
     for tile in game_tiles:
         title_element = tile.find('div', class_='product-tile__title')
-        price_element = tile.find('span', class_='product-price__free')
-
-        if title_element and price_element:
+        if title_element:
             title = title_element['title'].strip()  # Extract title from 'title' attribute
             link = tile['href']
             full_link = f"https://www.gog.com{link}"
 
-            games.append({
-                'title': title,
-                'link': full_link,
-                'price': 'Free'
-            })
+            games.append((title, full_link))  # Match format to Steam scraper
 
     return games
 
-# Function to scrape all GOG games (both always-free and discounted-free)
-def scrape_gog():
+# Test these updates for GOG scraping
+def main():
     gog_always_free_games = scrape_gog_always_free()
     gog_discounted_free_games = scrape_gog_discounted_free()
+
     all_free_games = gog_always_free_games + gog_discounted_free_games
-    return all_free_games
+
+    if all_free_games:
+        print(f"Found {len(all_free_games)} free games:")
+        for game in all_free_games:
+            print(f"Title: {game[0]}, Link: {game[1]}")
+    else:
+        print("No free games found.")
+
+# Run the scraper
+if __name__ == '__main__':
+    main()
