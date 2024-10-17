@@ -28,10 +28,10 @@ jobs:
 
     - name: Commit and push changes
       run: |
-        git config --global user.name 'Your Name'
-        git config --global user.email 'you@example.com'
+        git config --global user.name 'dwaynedibbli'
+        git config --global user.email 'geoffknight83@gmail.com'
         git add index.html
-        git commit -m "Daily update of free games list"
+        git commit -m "Daily update of free games list" || echo "No changes to commit"
         git push
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
