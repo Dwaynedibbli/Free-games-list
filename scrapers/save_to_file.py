@@ -25,22 +25,4 @@ def save_to_file(games_by_platform):
             for title, link in games_by_platform["Steam"]:
                 f.write(f'        <a href="{link}">{title}</a><br>\n')
         else:
-            f.write('        <p>No free games available today.</p>\n')
-
-        # Write GOG games
-        f.write(f'        <h2>GOG</h2>\n')
-        if games_by_platform["GOG"]:
-            for title, link in games_by_platform["GOG"]:
-                f.write(f'        <a href="{link}">{title}</a><br>\n')
-        else:
-            f.write('        <p>No free games available today.</p>\n')
-
-        f.write('    </div>\n')
-
-        # Include the legal disclaimer
-        f.write('<footer>\n')
-        f.write('    <p>This website is for informational purposes only. The free games listed are subject to availability and changes. Please refer to the respective platforms for the most up-to-date information.</p>\n')
-        f.write(f'    <p>Generated on {today}</p>\n')
-        f.write('</footer>\n')
-
-        f.write('</body>\n</html>')
+            f.write('        <p>No free
