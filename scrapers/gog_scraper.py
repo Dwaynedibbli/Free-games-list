@@ -10,7 +10,7 @@ def scrape_gog_always_free():
 
     print("Scraping GOG for always-free games...")
 
-    # Find all game items by looking for 'product-tile' class or similar
+    # Find all game items by looking for 'product-tile' class
     for item in soup.find_all('div', class_='product-tile'):
         title = item.find('span', class_='product-title').text
         link = item.find('a', href=True)['href']
@@ -19,7 +19,7 @@ def scrape_gog_always_free():
     print(f"GOG always-free games found: {games}")
     return games
 
-# Scrape GOG discounted-to-free games
+# Scrape GOG discounted-to-free games (looking for "Free" label)
 def scrape_gog_discounted():
     url = "https://www.gog.com/en/games?priceRange=0,0&discounted=true"
     response = requests.get(url)
@@ -32,7 +32,11 @@ def scrape_gog_discounted():
     for item in soup.find_all('div', class_='product-tile'):
         title = item.find('span', class_='product-title').text
         link = item.find('a', href=True)['href']
-        games.append((title, "https://www.gog.com" + link))
+        price_tag = item.find('span', class_='final-price')
+        
+        # Check if the price is listed as "Free"
+        if price_tag and price_tag.text.strip().lower() == "free":
+            games.append((title, "https://www.gog.com" + link))
 
     print(f"GOG discounted-to-free games found: {games}")
     return games
