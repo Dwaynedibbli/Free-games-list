@@ -14,10 +14,17 @@ def scrape_gog_always_free():
 
     for game in game_containers:
         title = game.find('span', class_='product-title__text').text.strip()  # Extract game title
-        link = game.find('a', class_='product-row__link')['href']
-        full_link = f"https://www.gog.com{link}"
+        price_free = game.find('span', class_='product-state__is-free')
 
-        games.append((title, full_link))  # Match format to Steam scraper
+        # If the game is free
+        if price_free:
+            link = game.find('a', class_='product-row__link')['href']
+            full_link = f"https://www.gog.com{link}"
+
+            games.append({
+                'title': title,
+                'link': full_link,
+            })
 
     return games
 
@@ -31,20 +38,29 @@ def scrape_gog_discounted_free():
 
     # Find all game containers with free price
     game_tiles = soup.find_all('a', class_='product-tile')
-    
+    print(f"Number of game tiles found: {len(game_tiles)}")
+
     for tile in game_tiles:
         title_element = tile.find('div', class_='product-tile__title')
-        if title_element:
+        price_element = tile.find('span', class_='product-price__free')
+
+        if title_element and price_element:
             title = title_element['title'].strip()  # Extract title from 'title' attribute
             link = tile['href']
             full_link = f"https://www.gog.com{link}"
 
-            games.append((title, full_link))  # Match format to Steam scraper
+            games.append({
+                'title': title,
+                'link': full_link,
+            })
 
     return games
 
-# Function to combine both scrapers and return all GOG games
+# Function to scrape GOG games (combining always-free and discounted-free)
 def scrape_gog():
-    always_free_games = scrape_gog_always_free()
-    discounted_free_games = scrape_gog_discounted_free()
-    return always_free_games + discounted_free_games
+    gog_always_free_games = scrape_gog_always_free()
+    gog_discounted_free_games = scrape_gog_discounted_free()
+
+    all_free_games = gog_always_free_games + gog_discounted_free_games
+
+    return all_free_games
