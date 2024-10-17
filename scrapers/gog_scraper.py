@@ -58,9 +58,11 @@ def scrape_gog_discounted_free():
 
 # Function to scrape GOG games (combining always-free and discounted-free)
 def scrape_gog():
+    # Scraping both free game types
     gog_always_free_games = scrape_gog_always_free()
     gog_discounted_free_games = scrape_gog_discounted_free()
 
+    # Combining results
     all_free_games = gog_always_free_games + gog_discounted_free_games
 
     return all_free_games
