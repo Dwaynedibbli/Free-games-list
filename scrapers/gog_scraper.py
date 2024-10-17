@@ -12,14 +12,19 @@ def scrape_gog_always_free():
 
     # Find all free games by looking for the class that indicates a free game
     for item in soup.find_all('div', class_='product-state__price-btn price-btn--free'):
-        title = item.find_previous('span', class_='product-title').text
-        link = item.find_previous('a', href=True)['href']
-        games.append((title, "https://www.gog.com" + link))
+        # Safely find the title and link
+        title_tag = item.find_previous('span', class_='product-title')
+        link_tag = item.find_previous('a', href=True)
+
+        if title_tag and link_tag:  # Ensure the elements exist
+            title = title_tag.text
+            link = link_tag['href']
+            games.append((title, "https://www.gog.com" + link))
 
     print(f"GOG always-free games found: {games}")
     return games
 
-# Scrape GOG discounted-to-free games
+# Scrape GOG discounted-to-free games (looking for "Free" label)
 def scrape_gog_discounted():
     url = "https://www.gog.com/en/games?priceRange=0,0&discounted=true"
     response = requests.get(url)
@@ -30,9 +35,14 @@ def scrape_gog_discounted():
 
     # Find all discounted free games by looking for the "Free" label in the product price
     for item in soup.find_all('span', class_='product-price__free'):
-        title = item.find_previous('span', class_='product-title').text
-        link = item.find_previous('a', href=True)['href']
-        games.append((title, "https://www.gog.com" + link))
+        # Safely find the title and link
+        title_tag = item.find_previous('span', class_='product-title')
+        link_tag = item.find_previous('a', href=True)
+
+        if title_tag and link_tag:  # Ensure the elements exist
+            title = title_tag.text
+            link = link_tag['href']
+            games.append((title, "https://www.gog.com" + link))
 
     print(f"GOG discounted-to-free games found: {games}")
     return games
