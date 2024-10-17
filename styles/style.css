@@ -1,0 +1,25 @@
+body {
+    background-color: black;
+    color: green;
+    font-family: monospace;
+}
+
+h1 {
+    text-align: center;
+}
+
+.game-list {
+    margin: 20px;
+}
+
+.game-list a {
+    color: #00FF00;
+    text-decoration: none;
+}
+
+footer {
+    text-align: center;
+    margin-top: 20px;
+    color: white;
+    font-size: 0.8em;
+}
