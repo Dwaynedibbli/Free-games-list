@@ -1,5 +1,6 @@
-from steam_scraper import scrape_steam, save_to_file
-from gog_scraper import scrape_gog
+from scrapers.steam_scraper import scrape_steam
+from scrapers.gog_scraper import scrape_gog
+from scrapers.save_to_file import save_to_file
 
 if __name__ == "__main__":
     # Run the Steam scraper
@@ -8,10 +9,10 @@ if __name__ == "__main__":
     # Run the GOG scraper
     gog_games = scrape_gog()
 
-    # Create a dictionary with both Steam and GOG games
+    # Ensure that Steam and GOG are always listed, even if no games are available
     games_by_platform = {
-        "Steam": steam_games,
-        "GOG": gog_games
+        "Steam": steam_games if steam_games else [],
+        "GOG": gog_games if gog_games else []
     }
 
     # Save the scraped data to index.html
