@@ -23,7 +23,7 @@ def scrape_gog_always_free():
 
             games.append({
                 'title': title,
-                'link': full_link,
+                'link': full_link
             })
 
     return games
@@ -47,22 +47,25 @@ def scrape_gog_discounted_free():
         if title_element and price_element:
             title = title_element['title'].strip()  # Extract title from 'title' attribute
             link = tile['href']
-            full_link = f"https://www.gog.com{link}"
+
+            # Avoid duplicating the base URL
+            if link.startswith('https://'):
+                full_link = link
+            else:
+                full_link = f"https://www.gog.com{link}"
 
             games.append({
                 'title': title,
-                'link': full_link,
+                'link': full_link
             })
 
     return games
 
-# Main function to scrape both free types of GOG games
+# Main function to combine results from both scrapers
 def scrape_gog():
-    # Scraping both free game types
     gog_always_free_games = scrape_gog_always_free()
     gog_discounted_free_games = scrape_gog_discounted_free()
 
-    # Combining results
     all_free_games = gog_always_free_games + gog_discounted_free_games
 
     return all_free_games
