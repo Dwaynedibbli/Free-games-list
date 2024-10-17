@@ -1,14 +1,11 @@
 from steam_scraper import scrape_steam, save_to_file
-from gog_scraper import scrape_gog
 
 if __name__ == "__main__":
     steam_games = scrape_steam()
-    gog_games = scrape_gog()
 
-    # Create a dictionary with both platforms
+    # Create a dictionary with Steam games
     games_by_platform = {
-        "Steam": steam_games,
-        "GOG": gog_games
+        "Steam": steam_games
     }
 
     # Save the scraped data to index.html
