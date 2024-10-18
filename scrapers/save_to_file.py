@@ -15,49 +15,65 @@ def save_to_file(games_by_platform):
 
         # Page title
         f.write(f'    <h1>Free Games Today</h1>\n')
-        
+
+        # Two Column Layout
         f.write('    <div class="platform-container">\n')
 
-        # Write Steam games
-        f.write(f'        <div class="platform-column">\n')
-        f.write(f'        <h2>Steam</h2>\n')
+        # Column 1 (Steam)
+        f.write('        <div class="platform-column">\n')
+        f.write('            <div class="banner-ad">\n')
+        f.write('                <p>Banner Ad</p>\n')  # Placeholder for the banner ad
+        f.write('            </div>\n')
+        f.write('            <h2>Steam</h2>\n')
+        f.write('            <div class="game-list">\n')
         if games_by_platform["Steam"]:
             for game in games_by_platform["Steam"]:
                 title, link = game  # Steam scraper uses tuple format
-                f.write(f'        <div class="game-item">\n')
-                f.write(f'            <a href="{link}">{title}</a><br>\n')
-                f.write(f'        </div>\n')
+                f.write(f'            <div class="game-item">\n')
+                f.write(f'                <a href="{link}">{title}</a><br>\n')
+                f.write('            </div>\n')
         else:
-            f.write('        <p>No free games available today.</p>\n')
-        f.write(f'        </div>\n')
+            f.write('            <p>No free games available today.</p>\n')
+        f.write('            </div>\n')  # End of Steam game list
+        f.write('        </div>\n')  # End of Steam column
 
-        # Write GOG games
-        f.write(f'        <div class="platform-column">\n')
-        f.write(f'        <h2>GOG</h2>\n')
+        # Column 2 (GOG)
+        f.write('        <div class="platform-column">\n')
+        f.write('            <div class="banner-ad">\n')
+        f.write('                <p>Banner Ad</p>\n')  # Placeholder for the banner ad
+        f.write('            </div>\n')
+        f.write('            <h2>GOG</h2>\n')
+        f.write('            <div class="game-list">\n')
         if games_by_platform["GOG"]:
             for game in games_by_platform["GOG"]:
-                title = game['title']  # Access the 'title' key from the dictionary
-                link = game['link']    # Access the 'link' key from the dictionary
-                f.write(f'        <div class="game-item">\n')
-                f.write(f'            <a href="{link}">{title}</a><br>\n')
-                f.write(f'        </div>\n')
+                title = game['title']
+                link = game['link']
+                f.write(f'            <div class="game-item">\n')
+                f.write(f'                <a href="{link}">{title}</a><br>\n')
+                f.write('            </div>\n')
         else:
-            f.write('        <p>No free games available today.</p>\n')
-        f.write(f'        </div>\n')
+            f.write('            <p>No free games available today.</p>\n')
+        f.write('            </div>\n')  # End of GOG game list
+        f.write('        </div>\n')  # End of GOG column
 
-        # Write Epic Games
-        f.write(f'        <div class="platform-column">\n')
-        f.write(f'        <h2>Epic Games</h2>\n')
+        # Column 3 (Epic Games)
+        f.write('        <div class="platform-column">\n')
+        f.write('            <div class="banner-ad">\n')
+        f.write('                <p>Banner Ad</p>\n')  # Placeholder for the banner ad
+        f.write('            </div>\n')
+        f.write('            <h2>Epic Games</h2>\n')
+        f.write('            <div class="game-list">\n')
         if games_by_platform["Epic"]:
             for game in games_by_platform["Epic"]:
-                title = game['title']  # Access the 'title' key from the dictionary
-                link = game['link']    # Access the 'link' key from the dictionary
-                f.write(f'        <div class="game-item">\n')
-                f.write(f'            <a href="{link}">{title}</a><br>\n')
-                f.write(f'        </div>\n')
+                title = game['title']
+                link = game['link']
+                f.write(f'            <div class="game-item">\n')
+                f.write(f'                <a href="{link}">{title}</a><br>\n')
+                f.write('            </div>\n')
         else:
-            f.write('        <p>No free games available today.</p>\n')
-        f.write(f'        </div>\n')
+            f.write('            <p>No free games available today.</p>\n')
+        f.write('            </div>\n')  # End of Epic game list
+        f.write('        </div>\n')  # End of Epic column
 
         f.write('    </div>\n')  # End of platform-container
 
