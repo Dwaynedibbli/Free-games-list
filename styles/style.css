@@ -33,9 +33,9 @@ body {
     line-height: 150px; /* Vertically center content */
 }
 
-/* Website title */
-h2 {
-    font-size: 1.8em;
+/* Page title (increased size) */
+h1, h2 {
+    font-size: 3em; /* Increased size for title */
     color: #f0f0f0;
     margin-bottom: 10px;
 }
