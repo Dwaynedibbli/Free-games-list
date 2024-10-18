@@ -23,10 +23,10 @@ if __name__ == "__main__":
     # Save the scraped data to index.html
     save_to_file(games_by_platform)
 
-    # Append the disclaimer from './styles/disclaimer.html'
-    with open('./styles/disclaimer.html', 'r') as disclaimer_file:
+    # Correct path with proper capitalization for "Disclaimer.html"
+    with open('styles/Disclaimer.html', 'r') as disclaimer_file:
         disclaimer_content = disclaimer_file.read()
 
     # Append the disclaimer to the end of the index.html file
-    with open('./index.html', 'a') as index_file:
+    with open('index.html', 'a') as index_file:
         index_file.write(disclaimer_content)
