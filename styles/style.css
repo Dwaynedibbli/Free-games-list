@@ -1,79 +1,81 @@
-/* Base Styles */
+/* General page style */
 body {
-    background-color: black;
-    color: #00FF00;
-    font-family: 'Courier New', Courier, monospace;
+    background-color: #1a1a1a; /* Dark gray for background */
+    color: #f0f0f0; /* Light gray for text */
+    font-family: 'Roboto', sans-serif; /* Clean, modern font */
     margin: 0;
     padding: 0;
 }
 
-/* Header Style */
-h1 {
+/* Two-column grid layout for the platform boxes */
+.platform-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Two columns */
+    gap: 20px; /* Space between cards */
+    padding: 20px;
+}
+
+/* Platform card styling */
+.platform-card {
+    background-color: #2a2a2a; /* Slightly lighter gray for card background */
+    padding: 20px;
+    border-radius: 10px; /* Rounded corners for a modern look */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+}
+
+/* Banner ad section within each platform card */
+.banner-ad {
+    height: 150px; /* Fixed height for ad */
+    background-color: #333; /* Placeholder dark gray color */
+    margin-bottom: 10px;
     text-align: center;
-    font-size: 3em;
-    letter-spacing: 2px;
-    animation: fadeIn 1.5s ease-in-out;
+    color: #f0f0f0; /* Placeholder text color */
+    line-height: 150px; /* Vertically center text in banner */
 }
 
-/* Game List */
+/* Title styling for the platform (e.g., Steam, GOG) */
+.platform-card h2 {
+    font-size: 1.8em;
+    margin-bottom: 10px;
+    color: #e0e0e0; /* Slightly lighter gray for titles */
+}
+
+/* Game list within each platform card */
 .game-list {
-    margin: 20px;
+    display: flex;
+    flex-direction: column; /* Stacks games vertically */
 }
 
-.game-list a {
-    color: #00FF00;
+/* Individual game item styling */
+.game-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px; /* Space between game entries */
+}
+
+.game-item img {
+    width: 50px; /* Thumbnail size */
+    height: 50px;
+    margin-right: 10px;
+    border-radius: 5px; /* Rounded corners for images */
+}
+
+.game-item a {
+    color: #4a90e2; /* Blue link color for games */
     text-decoration: none;
-    font-size: 1.2em;
-    transition: color 0.3s ease;
+    font-size: 1.1em;
 }
 
-.game-list a:hover {
-    color: #33FF33;
+.game-item a:hover {
+    color: #f5a623; /* Orange on hover */
 }
 
-/* Subtle Hover Animations */
-footer p, .game-list a:hover {
-    animation: pulse 0.7s infinite;
-}
-
-/* Footer */
+/* Footer styling for the disclaimer */
 footer {
     text-align: center;
+    padding: 20px;
+    font-size: 0.9em;
+    color: #e0e0e0;
+    background-color: #101010; /* Dark footer background */
     margin-top: 50px;
-    padding: 10px;
-    background-color: #101010;
-    color: white;
-    font-size: 0.8em;
-}
-
-/* ASCII Art Style */
-.ascii-art {
-    font-size: 1.5em;
-    color: #00FF00;
-    text-align: center;
-}
-
-/* Animations */
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes pulse {
-    0% { color: #00FF00; }
-    50% { color: #33FF33; }
-    100% { color: #00FF00; }
-}
-
-/* Subtle Background Animation */
-body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: url('https://your-background-image-url.com') repeat-y center;
-    opacity: 0.05; /* Very faint */
-    z-index: -1;
 }
