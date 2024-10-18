@@ -29,12 +29,15 @@ if __name__ == "__main__":
         f.write('<html lang="en">\n<head>\n')
         f.write('    <meta charset="UTF-8">\n')
         f.write('    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n')
-        f.write('    <title>Free Games Today</title>\n')
+        f.write('    <title>Free Today</title>\n')  # Title is now only here
         f.write('    <link rel="stylesheet" type="text/css" href="styles/style.css">\n')
         f.write('</head>\n<body>\n')
 
-        # Page title
-        f.write(f'    <h1>Free Games Today</h1>\n')
+        # Title and Logo
+        f.write('    <div class="title-container">\n')
+        f.write('        <img src="styles/logo.png" alt="Logo" class="logo">\n')  # Add your logo here
+        f.write('        <h1>Free Today</h1>\n')  # Updated title
+        f.write('    </div>\n')
 
         # Two Column Layout
         f.write('    <div class="platform-container">\n')
