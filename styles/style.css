@@ -1,73 +1,73 @@
 /* General page style */
 body {
-    background-color: #1a1a1a; /* Dark gray for background */
-    color: #f0f0f0; /* Light gray for text */
-    font-family: 'Roboto', sans-serif; /* Clean, modern font */
+    background-color: #2e2e2e; /* Lighter gray background */
+    color: #f0f0f0; /* Light text for readability */
+    font-family: 'Roboto', sans-serif;
     margin: 0;
     padding: 0;
 }
 
-/* Two-column grid layout for the platform boxes */
+/* Two-column layout */
 .platform-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr); /* Two columns */
-    gap: 20px; /* Space between cards */
+    gap: 20px;
     padding: 20px;
 }
 
-/* Platform card styling */
-.platform-card {
-    background-color: #2a2a2a; /* Slightly lighter gray for card background */
+/* Individual platform column */
+.platform-column {
+    background-color: #3a3a3a; /* Slightly darker gray for cards */
     padding: 20px;
-    border-radius: 10px; /* Rounded corners for a modern look */
+    border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
 }
 
-/* Banner ad section within each platform card */
+/* Banner ad section */
 .banner-ad {
-    height: 150px; /* Fixed height for ad */
-    background-color: #333; /* Placeholder dark gray color */
+    height: 150px; /* Fixed height for the ad */
+    background-color: #444; /* Placeholder darker gray */
     margin-bottom: 10px;
     text-align: center;
-    color: #f0f0f0; /* Placeholder text color */
-    line-height: 150px; /* Vertically center text in banner */
+    color: #f0f0f0;
+    line-height: 150px; /* Vertically center content */
 }
 
-/* Title styling for the platform (e.g., Steam, GOG) */
-.platform-card h2 {
+/* Website title */
+h2 {
     font-size: 1.8em;
+    color: #f0f0f0;
     margin-bottom: 10px;
-    color: #e0e0e0; /* Slightly lighter gray for titles */
 }
 
-/* Game list within each platform card */
+/* Game list layout */
 .game-list {
     display: flex;
-    flex-direction: column; /* Stacks games vertically */
+    flex-direction: column;
 }
 
-/* Individual game item styling */
+/* Game item */
 .game-item {
     display: flex;
     align-items: center;
-    margin-bottom: 10px; /* Space between game entries */
+    margin-bottom: 10px;
 }
 
 .game-item img {
-    width: 50px; /* Thumbnail size */
+    width: 50px;
     height: 50px;
     margin-right: 10px;
-    border-radius: 5px; /* Rounded corners for images */
+    border-radius: 5px;
 }
 
 .game-item a {
-    color: #4a90e2; /* Blue link color for games */
+    color: #4a90e2; /* Link color */
     text-decoration: none;
     font-size: 1.1em;
 }
 
 .game-item a:hover {
-    color: #f5a623; /* Orange on hover */
+    color: #f5a623; /* Hover effect for links */
 }
 
 /* Footer styling for the disclaimer */
