@@ -16,7 +16,11 @@ def scrape_google_play():
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--window-size=1920,1080")
     chrome_options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36")
-
+    
+    # Added suggestions: Enable logging to debug potential issues
+    chrome_options.add_argument('--enable-logging')
+    chrome_options.add_argument('--v=1')
+    
     # Set up the Chrome WebDriver with the options
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
@@ -34,20 +38,24 @@ def scrape_google_play():
         driver.quit()
         return []
 
+    # Added suggestion: Scroll function to dynamically load more games
+    def scroll_page():
+        last_height = driver.execute_script("return document.body.scrollHeight")
+        while True:
+            # Scroll down to the bottom
+            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+
+            # Wait for new content to load
+            time.sleep(3)  # Adjust wait time as necessary
+
+            # Calculate new scroll height and compare with last scroll height
+            new_height = driver.execute_script("return document.body.scrollHeight")
+            if new_height == last_height:
+                break
+            last_height = new_height
+
     # Scroll down to load more games until no more new items are loaded
-    last_height = driver.execute_script("return document.body.scrollHeight")
-    while True:
-        # Scroll down to the bottom
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-
-        # Wait for new content to load
-        time.sleep(3)  # Reduced wait time to improve performance
-
-        # Calculate new scroll height and compare with last scroll height
-        new_height = driver.execute_script("return document.body.scrollHeight")
-        if new_height == last_height:
-            break
-        last_height = new_height
+    scroll_page()
 
     # Find all free game elements
     games = driver.find_elements(By.CLASS_NAME, 'Si6A0c')
