@@ -37,9 +37,6 @@ def scrape_epic():
     # Add sleep to ensure the content is loaded
     time.sleep(5)
 
-    # Debugging: Print the page source to see if the elements are available
-    print(driver.page_source)
-
     # Find all free game elements
     games = driver.find_elements(By.CLASS_NAME, 'css-2mlzob')
 
@@ -50,9 +47,10 @@ def scrape_epic():
         try:
             link_element = game.find_element(By.TAG_NAME, 'a')
             title_element = game.find_element(By.TAG_NAME, 'h6')
+            status_element = game.find_element(By.CLASS_NAME, 'css-gyjcm9')  # The element that may contain "Coming Soon"
 
             # Skip games that are "Coming Soon"
-            if "Coming Soon" in game.text:
+            if status_element and "Coming Soon" in status_element.text:
                 continue
 
             if link_element and title_element:
