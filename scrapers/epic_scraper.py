@@ -68,9 +68,12 @@ def scrape_epic():
         except Exception as e:
             print(f"Error processing a game: {e}")
 
+    # Filter out games that have "Coming Soon" or "Free Next Week" in the title or status
+    filtered_games = [game for game in free_games if not any(phrase in game['title'].lower() for phrase in ["coming soon", "free next week"])]
+
     # Print the extracted free games for debugging
-    if free_games:
-        for game in free_games:
+    if filtered_games:
+        for game in filtered_games:
             print(f"Title: {game['title']}, Link: {game['link']}")
     else:
         print("No free games found.")
@@ -78,7 +81,7 @@ def scrape_epic():
     # Close the browser
     driver.quit()
 
-    return free_games
+    return filtered_games
 
 # Run the scraper
 if __name__ == "__main__":
