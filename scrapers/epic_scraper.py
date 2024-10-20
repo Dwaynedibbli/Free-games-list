@@ -48,15 +48,9 @@ def scrape_epic():
             link_element = game.find_element(By.CLASS_NAME, 'css-g3jcms')
             title_element = game.find_element(By.CLASS_NAME, 'eds_1ypbntd0')
 
-            # Check if the game has a "Coming Soon" or "Free Next Week" status
-            try:
-                status_element = game.find_element(By.CLASS_NAME, 'css-82y1uz')
-                status_text = status_element.text.strip().lower()
-                if "coming soon" in status_text or "free next week" in status_text or "available" in status_text:
-                    continue
-            except:
-                # If no "Coming Soon" status element found, proceed
-                pass
+            # Check if the game has a "Coming Soon" status in the aria-label attribute
+            if "coming soon" in link_element.get_attribute("aria-label").strip().lower():
+                continue
 
             if link_element and title_element:
                 title = title_element.text.strip()
@@ -68,12 +62,9 @@ def scrape_epic():
         except Exception as e:
             print(f"Error processing a game: {e}")
 
-    # Filter out games that have "Coming Soon" or "Free Next Week" in the title or status
-    filtered_games = [game for game in free_games if not any(phrase in game['title'].lower() for phrase in ["coming soon", "free next week"])]
-
     # Print the extracted free games for debugging
-    if filtered_games:
-        for game in filtered_games:
+    if free_games:
+        for game in free_games:
             print(f"Title: {game['title']}, Link: {game['link']}")
     else:
         print("No free games found.")
@@ -81,7 +72,7 @@ def scrape_epic():
     # Close the browser
     driver.quit()
 
-    return filtered_games
+    return free_games
 
 # Run the scraper
 if __name__ == "__main__":
