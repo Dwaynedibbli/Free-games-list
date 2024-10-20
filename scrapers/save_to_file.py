@@ -48,3 +48,19 @@ def save_to_file(games_by_platform):
             f.write('            <p>No free games available today.</p>\n')
         f.write('            </div>\n')  # End of Epic game list
         f.write('        </div>\n')  # End of Epic column
+
+        # Write Google Play games
+        f.write('        <div class="platform-column">\n')
+        f.write('            <h2>Google Play Store</h2>\n')
+        f.write('            <div class="game-list">\n')
+        if games_by_platform["Google Play"]:
+            for game in games_by_platform["Google Play"]:
+                title = game['title']
+                link = game['link']
+                f.write(f'            <div class="game-item">\n')
+                f.write(f'                <a href="{link}">{title}</a><br>\n')
+                f.write('            </div>\n')
+        else:
+            f.write('            <p>No free games available today.</p>\n')
+        f.write('            </div>\n')  # End of Google Play game list
+        f.write('        </div>\n')  # End of Google Play column
