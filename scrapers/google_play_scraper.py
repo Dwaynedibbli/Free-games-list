@@ -37,7 +37,7 @@ def scrape_google_play():
     # Add sleep to ensure the content is loaded
     time.sleep(5)
 
-    # Scroll down to load more games
+    # Scroll down to load more games until no more new items are loaded
     last_height = driver.execute_script("return document.body.scrollHeight")
     while True:
         # Scroll down to the bottom
@@ -60,11 +60,8 @@ def scrape_google_play():
     # Loop through the games and extract title, link, and price
     for game in games:
         try:
-            # Extract the link from the <a> tag
             link_element = game.find_element(By.TAG_NAME, 'a').get_attribute('href')
-            # Extract the title from the appropriate class
             title_element = game.find_element(By.CLASS_NAME, 'DdYX5').text.strip()
-            # Find all price elements
             price_elements = game.find_elements(By.CLASS_NAME, 'w2kbF')
 
             # Check if the game has a price of $0.00
