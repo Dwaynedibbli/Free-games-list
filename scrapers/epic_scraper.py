@@ -1,15 +1,21 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
+from selenium.common.exceptions import TimeoutException
 from webdriver_manager.chrome import ChromeDriverManager
 
-# Function to scrape currently free games from Epic Games Store
 def scrape_epic():
-    # Set up the Chrome WebDriver
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+    # Set up Chrome options to run headlessly
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+
+    # Set up the Chrome WebDriver with the options
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
     # Open the Epic Games Store Free Games page
     driver.get("https://store.epicgames.com/en-US/free-games")
@@ -36,8 +42,8 @@ def scrape_epic():
             link_element = game.find_element(By.TAG_NAME, 'a')
             title_element = game.find_element(By.TAG_NAME, 'h6')
 
-            # Check if the game is listed as "Coming Soon" using aria-label attribute
-            if 'Coming Soon' in link_element.get_attribute('aria-label'):
+            # Skip games that are "Coming Soon"
+            if "Coming Soon" in game.text:
                 continue
 
             if link_element and title_element:
@@ -47,7 +53,7 @@ def scrape_epic():
                     'title': title,
                     'link': link
                 })
-        except NoSuchElementException as e:
+        except Exception as e:
             print(f"Error processing a game: {e}")
 
     # Close the browser
