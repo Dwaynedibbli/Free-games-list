@@ -48,14 +48,14 @@ def scrape_epic():
             link_element = game.find_element(By.CLASS_NAME, 'css-g3jcms')
             title_element = game.find_element(By.CLASS_NAME, 'eds_1ypbntd0')
 
-            # Check if the game is currently free (exclude "Coming Soon" and "Free Next Week" games)
+            # Check if the game has a "Coming Soon" or "Free Next Week" status
             try:
                 status_element = game.find_element(By.CLASS_NAME, 'css-82y1uz')
                 status_text = status_element.text.strip().lower()
-                if "coming soon" in status_text or "free next week" in status_text:
+                if "coming soon" in status_text or "free next week" in status_text or "available" in status_text:
                     continue
             except:
-                # If no status element found, proceed
+                # If no "Coming Soon" status element found, proceed
                 pass
 
             if link_element and title_element:
