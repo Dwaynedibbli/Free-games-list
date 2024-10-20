@@ -11,7 +11,7 @@ import time
 def scrape_google_play():
     # Set up Chrome options for headless mode
     chrome_options = Options()
-    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--headless")  # Remove this line if you want to see the browser window
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--window-size=1920,1080")
@@ -34,9 +34,6 @@ def scrape_google_play():
         driver.quit()
         return []
 
-    # Add sleep to ensure the content is loaded
-    time.sleep(5)
-
     # Scroll down to load more games until no more new items are loaded
     last_height = driver.execute_script("return document.body.scrollHeight")
     while True:
@@ -44,7 +41,7 @@ def scrape_google_play():
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
         # Wait for new content to load
-        time.sleep(5)
+        time.sleep(3)  # Reduced wait time to improve performance
 
         # Calculate new scroll height and compare with last scroll height
         new_height = driver.execute_script("return document.body.scrollHeight")
@@ -60,12 +57,12 @@ def scrape_google_play():
     # Loop through the games and extract title, link, and price
     for game in games:
         try:
-            link_element = game.find_element(By.TAG_NAME, 'a').get_attribute('href')
+            link_element = game.find_element(By.CSS_SELECTOR, 'a').get_attribute('href')
             title_element = game.find_element(By.CLASS_NAME, 'DdYX5').text.strip()
             price_elements = game.find_elements(By.CLASS_NAME, 'w2kbF')
 
-            # Check if the game has a price of $0.00
-            if any(price_element.text.strip() == "$0.00" for price_element in price_elements):
+            # Check if the game has a price of Free or $0.00
+            if any(price_element.text.strip() in ["Free", "$0.00"] for price_element in price_elements):
                 free_games.append({
                     'title': title_element,
                     'link': link_element
