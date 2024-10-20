@@ -47,19 +47,17 @@ def scrape_epic():
         try:
             link_element = game.find_element(By.TAG_NAME, 'a')
             title_element = game.find_element(By.TAG_NAME, 'h6')
-            status_element = game.find_element(By.CLASS_NAME, 'css-gyjcm9')  # The element that may contain "Coming Soon"
+            status_elements = game.find_elements(By.CLASS_NAME, 'css-gyjcm9')  # The element that may contain "Coming Soon"
 
-            # Skip games that are "Coming Soon"
-            if status_element and "Coming Soon" in status_element.text.strip():
-                continue
-
-            if link_element and title_element:
-                title = title_element.text.strip()
-                link = link_element.get_attribute('href')
-                free_games.append({
-                    'title': title,
-                    'link': link
-                })
+            # Only add games that are not "Coming Soon"
+            if not any(status_element.text.strip() == "Coming Soon" for status_element in status_elements):
+                if link_element and title_element:
+                    title = title_element.text.strip()
+                    link = link_element.get_attribute('href')
+                    free_games.append({
+                        'title': title,
+                        'link': link
+                    })
         except Exception as e:
             print(f"Error processing a game: {e}")
 
