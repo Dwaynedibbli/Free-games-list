@@ -23,13 +23,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install beautifulsoup4 requests selenium webdriver-manager
 
-    - name: Set up Chrome
+    - name: Set up ChromeDriver
       run: |
         sudo apt-get update
-        sudo apt-get install -y wget unzip
-        wget -q -O chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-        sudo dpkg -i chrome.deb || sudo apt-get -f install -y
-        google-chrome --version
+        sudo apt-get install -y google-chrome-stable
 
     - name: Run main scraper
       run: python main_scraper.py
