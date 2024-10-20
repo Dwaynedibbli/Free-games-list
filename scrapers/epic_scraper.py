@@ -47,15 +47,11 @@ def scrape_epic():
         try:
             link_element = game.find_element(By.TAG_NAME, 'a')
             title_element = game.find_element(By.TAG_NAME, 'h6')
+            status_elements = game.find_elements(By.CLASS_NAME, 'css-gyjcm9')  # The element that may contain "Coming Soon"
 
-            # Check if the game has a "Coming Soon" status
-            try:
-                status_element = game.find_element(By.CLASS_NAME, 'css-gyjcm9')
-                if status_element.text.strip().lower() == "coming soon":
-                    continue
-            except:
-                # If no "Coming Soon" status element found, proceed
-                pass
+            # Skip games that are "Coming Soon"
+            if any("Coming Soon" in status_element.text.strip() for status_element in status_elements):
+                continue
 
             if link_element and title_element:
                 title = title_element.text.strip()
