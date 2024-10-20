@@ -78,3 +78,7 @@ def scrape_epic():
     driver.quit()
 
     return free_games
+
+# Run the scraper
+if __name__ == "__main__":
+    scrape_epic()
