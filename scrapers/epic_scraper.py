@@ -1,29 +1,56 @@
-import requests
-from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
+from webdriver_manager.chrome import ChromeDriverManager
 
 # Function to scrape currently free games from Epic Games Store
 def scrape_epic():
-    url = 'https://store.epicgames.com/en-US/free-games'
-    response = requests.get(url)
-    soup = BeautifulSoup(response.content, 'html.parser')
+    # Set up the Chrome WebDriver
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
 
-    games = []
+    # Open the Epic Games Store Free Games page
+    driver.get("https://store.epicgames.com/en-US/free-games")
 
-    # Find all game containers with the free price
-    game_tiles = soup.find_all('div', class_='css-1myhtyb')
+    # Wait for the page to load
+    try:
+        # Wait until the elements with the game class are present
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_all_elements_located((By.CLASS_NAME, 'css-2mlzob'))
+        )
+    except TimeoutException:
+        print("Page took too long to load.")
+        driver.quit()
+        return []
 
-    for tile in game_tiles:
-        title_element = tile.find('span', class_='css-2ucwu')
-        link_element = tile.find('a', class_='css-1jx3eyg')
+    # Find all free game elements
+    games = driver.find_elements(By.CLASS_NAME, 'css-2mlzob')
 
-        if title_element and link_element:
-            title = title_element.text.strip()  # Extract title from text
-            link = link_element['href']
-            full_link = f"https://store.epicgames.com{link}"
+    free_games = []
 
-            games.append({
-                'title': title,
-                'link': full_link
-            })
+    # Loop through the games and extract title and link
+    for game in games:
+        try:
+            link_element = game.find_element(By.TAG_NAME, 'a')
+            title_element = game.find_element(By.TAG_NAME, 'h6')
 
-    return games
+            # Check if the game is listed as "Coming Soon" using aria-label attribute
+            if 'Coming Soon' in link_element.get_attribute('aria-label'):
+                continue
+
+            if link_element and title_element:
+                title = title_element.text.strip()
+                link = link_element.get_attribute('href')
+                free_games.append({
+                    'title': title,
+                    'link': link
+                })
+        except NoSuchElementException as e:
+            print(f"Error processing a game: {e}")
+
+    # Close the browser
+    driver.quit()
+
+    return free_games
