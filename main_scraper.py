@@ -1,6 +1,7 @@
 from scrapers.steam_scraper import scrape_steam
 from scrapers.gog_scraper import scrape_gog
-from scrapers.epic_scraper import scrape_epic  # Import Epic scraper
+from scrapers.epic_scraper import scrape_epic
+from scrapers.google_play_scraper import scrape_google_play  # Import Google Play scraper
 from scrapers.save_to_file import save_to_file
 from datetime import datetime
 
@@ -14,11 +15,15 @@ if __name__ == "__main__":
     # Run the Epic scraper
     epic_games = scrape_epic()
 
-    # Ensure that Steam, GOG, and Epic are always listed, even if no games are available
+    # Run the Google Play scraper
+    google_play_games = scrape_google_play()
+
+    # Ensure that Steam, GOG, Epic, and Google Play are always listed, even if no games are available
     games_by_platform = {
         "Steam": steam_games if steam_games else [],
         "GOG": gog_games if gog_games else [],
-        "Epic": epic_games if epic_games else []  # Add Epic Games
+        "Epic": epic_games if epic_games else [],
+        "Google Play": google_play_games if google_play_games else []  # Add Google Play Games
     }
 
     # Save the scraped data to index.html
@@ -29,14 +34,14 @@ if __name__ == "__main__":
         f.write('<html lang="en">\n<head>\n')
         f.write('    <meta charset="UTF-8">\n')
         f.write('    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n')
-        f.write('    <title>Free Today</title>\n')  # Title is now only here
+        f.write('    <title>Free Today</title>\n')
         f.write('    <link rel="stylesheet" type="text/css" href="styles/style.css">\n')
         f.write('</head>\n<body>\n')
 
         # Title and Logo
         f.write('    <div class="title-container">\n')
-        f.write('        <img src="styles/logo.png" alt="Logo" class="logo">\n')  # Add your logo here
-        f.write('        <h1>Free Today</h1>\n')  # Updated title
+        f.write('        <img src="styles/logo.png" alt="Logo" class="logo">\n')
+        f.write('        <h1>Free Today</h1>\n')
         f.write('    </div>\n')
 
         # Two Column Layout
@@ -45,25 +50,25 @@ if __name__ == "__main__":
         # Column 1 (Steam)
         f.write('        <div class="platform-column">\n')
         f.write('            <div class="banner-ad">\n')
-        f.write('                <p>Banner Ad</p>\n')  # Placeholder for the banner ad
+        f.write('                <p>Banner Ad</p>\n')
         f.write('            </div>\n')
         f.write('            <h2>Steam</h2>\n')
         f.write('            <div class="game-list">\n')
         if games_by_platform["Steam"]:
             for game in games_by_platform["Steam"]:
-                title, link = game  # Steam scraper uses tuple format
+                title, link = game
                 f.write(f'            <div class="game-item">\n')
                 f.write(f'                <a href="{link}">{title}</a><br>\n')
                 f.write('            </div>\n')
         else:
             f.write('            <p>No free games available today.</p>\n')
-        f.write('            </div>\n')  # End of Steam game list
-        f.write('        </div>\n')  # End of Steam column
+        f.write('            </div>\n')
+        f.write('        </div>\n')
 
         # Column 2 (GOG)
         f.write('        <div class="platform-column">\n')
         f.write('            <div class="banner-ad">\n')
-        f.write('                <p>Banner Ad</p>\n')  # Placeholder for the banner ad
+        f.write('                <p>Banner Ad</p>\n')
         f.write('            </div>\n')
         f.write('            <h2>GOG</h2>\n')
         f.write('            <div class="game-list">\n')
@@ -76,13 +81,13 @@ if __name__ == "__main__":
                 f.write('            </div>\n')
         else:
             f.write('            <p>No free games available today.</p>\n')
-        f.write('            </div>\n')  # End of GOG game list
-        f.write('        </div>\n')  # End of GOG column
+        f.write('            </div>\n')
+        f.write('        </div>\n')
 
         # Column 3 (Epic Games)
         f.write('        <div class="platform-column">\n')
         f.write('            <div class="banner-ad">\n')
-        f.write('                <p>Banner Ad</p>\n')  # Placeholder for the banner ad
+        f.write('                <p>Banner Ad</p>\n')
         f.write('            </div>\n')
         f.write('            <h2>Epic Games</h2>\n')
         f.write('            <div class="game-list">\n')
@@ -95,10 +100,29 @@ if __name__ == "__main__":
                 f.write('            </div>\n')
         else:
             f.write('            <p>No free games available today.</p>\n')
-        f.write('            </div>\n')  # End of Epic game list
-        f.write('        </div>\n')  # End of Epic column
+        f.write('            </div>\n')
+        f.write('        </div>\n')
 
-        f.write('    </div>\n')  # End of platform-container
+        # Column 4 (Google Play Store)
+        f.write('        <div class="platform-column">\n')
+        f.write('            <div class="banner-ad">\n')
+        f.write('                <p>Banner Ad</p>\n')
+        f.write('            </div>\n')
+        f.write('            <h2>Google Play Store</h2>\n')
+        f.write('            <div class="game-list">\n')
+        if games_by_platform["Google Play"]:
+            for game in games_by_platform["Google Play"]:
+                title = game['title']
+                link = game['link']
+                f.write(f'            <div class="game-item">\n')
+                f.write(f'                <a href="{link}">{title}</a><br>\n')
+                f.write('            </div>\n')
+        else:
+            f.write('            <p>No free games available today.</p>\n')
+        f.write('            </div>\n')
+        f.write('        </div>\n')
+
+        f.write('    </div>\n')
 
         # Footer with date
         f.write('<footer>\n')
