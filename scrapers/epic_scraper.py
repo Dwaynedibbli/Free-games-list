@@ -27,7 +27,7 @@ def scrape_epic():
     try:
         # Wait until the elements with the game class are present
         WebDriverWait(driver, 20).until(
-            EC.presence_of_all_elements_located((By.CLASS_NAME, 'css-2mlzob'))
+            EC.presence_of_all_elements_located((By.CLASS_NAME, 'css-17st2kc'))
         )
     except TimeoutException:
         print("Page took too long to load.")
@@ -38,19 +38,19 @@ def scrape_epic():
     time.sleep(5)
 
     # Find all free game elements
-    games = driver.find_elements(By.CLASS_NAME, 'css-2mlzob')
+    games = driver.find_elements(By.CLASS_NAME, 'css-17st2kc')
 
     free_games = []
 
     # Loop through the games and extract title and link
     for game in games:
         try:
-            link_element = game.find_element(By.TAG_NAME, 'a')
-            title_element = game.find_element(By.TAG_NAME, 'h6')
+            link_element = game.find_element(By.CLASS_NAME, 'css-g3jcms')
+            title_element = game.find_element(By.CLASS_NAME, 'eds_1ypbntd0')
 
             # Check if the game has a "Coming Soon" status
             try:
-                status_element = game.find_element(By.CLASS_NAME, 'css-gyjcm9')
+                status_element = game.find_element(By.CLASS_NAME, 'css-82y1uz')
                 if "coming soon" in status_element.text.strip().lower():
                     continue
             except:
