@@ -27,7 +27,7 @@ def scrape_epic():
     try:
         # Wait until the elements with the game class are present
         WebDriverWait(driver, 20).until(
-            EC.presence_of_all_elements_located((By.CLASS_NAME, 'css-17st2kc'))
+            EC.presence_of_element_located((By.XPATH, '//span[contains(text(), "Free Now")]'))
         )
     except TimeoutException:
         print("Page took too long to load.")
@@ -37,28 +37,20 @@ def scrape_epic():
     # Add sleep to ensure the content is loaded
     time.sleep(5)
 
-    # Find all free game elements
-    games = driver.find_elements(By.CLASS_NAME, 'css-17st2kc')
+    # Find all free game elements by the visible "Free Now" button
+    games = driver.find_elements(By.XPATH, '//span[contains(text(), "Free Now")]/ancestor::a')
 
     free_games = []
 
     # Loop through the games and extract title and link
     for game in games:
         try:
-            link_element = game.find_element(By.CLASS_NAME, 'css-g3jcms')
-            title_element = game.find_element(By.CLASS_NAME, 'eds_1ypbntd0')
-
-            # Check if the game has a "Coming Soon" status in the aria-label attribute
-            if "coming soon" in link_element.get_attribute("aria-label").strip().lower():
-                continue
-
-            if link_element and title_element:
-                title = title_element.text.strip()
-                link = link_element.get_attribute('href')
-                free_games.append({
-                    'title': title,
-                    'link': link
-                })
+            title = game.get_attribute("aria-label")  # Assuming the aria-label contains the title
+            link = game.get_attribute('href')
+            free_games.append({
+                'title': title,
+                'link': link
+            })
         except Exception as e:
             print(f"Error processing a game: {e}")
 
