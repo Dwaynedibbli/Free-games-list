@@ -1,7 +1,6 @@
 # scrapers/prime_gaming_scraper.py
 
 import time
-import re
 import logging
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -15,7 +14,6 @@ from selenium.common.exceptions import (
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import os
 
 
 def setup_logging():
@@ -31,61 +29,47 @@ def setup_logging():
     logging.getLogger().addHandler(logging.StreamHandler())  # Also log to console
 
 
-def incremental_scroll(driver, pause_time=2, scroll_increment=1000, max_scrolls=100):
+def incremental_scroll(driver, pause_time=3, max_scrolls=100):
     """
-    Scrolls the page incrementally to ensure all dynamic content loads.
-
+    Scrolls the page to load all dynamic content until no new content is loaded.
+    
     :param driver: Selenium WebDriver instance
     :param pause_time: Time to wait after each scroll (in seconds)
-    :param scroll_increment: Number of pixels to scroll each time
     :param max_scrolls: Maximum number of scroll attempts to prevent infinite loops
     """
-    last_height = driver.execute_script("return window.pageYOffset + window.innerHeight;")
-    total_height = driver.execute_script("return document.body.scrollHeight;")
-    
+    last_height = driver.execute_script("return document.body.scrollHeight")
+    logging.debug(f"Initial page height: {last_height}")
+
     for scroll in range(1, max_scrolls + 1):
-        # Scroll down by the specified increment
-        driver.execute_script(f"window.scrollBy(0, {scroll_increment});")
-        logging.debug(f"Scrolled down by {scroll_increment} pixels: Scroll {scroll}/{max_scrolls}")
+        # Scroll down to the bottom of the page
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        logging.debug(f"Scrolled to bottom: Attempt {scroll}/{max_scrolls}")
         time.sleep(pause_time)
-        
-        # Calculate new scroll position and total height
-        new_scroll_position = driver.execute_script("return window.pageYOffset + window.innerHeight;")
-        new_total_height = driver.execute_script("return document.body.scrollHeight;")
-        
-        logging.debug(f"Current Scroll Position: {new_scroll_position} | Total Page Height: {new_total_height}")
-        
-        # Check if we've reached the bottom of the page
-        if new_scroll_position >= new_total_height:
-            logging.debug("Reached the bottom of the page.")
+
+        # Calculate new scroll height and compare with last scroll height
+        new_height = driver.execute_script("return document.body.scrollHeight")
+        logging.debug(f"New page height after scroll {scroll}: {new_height}")
+
+        if new_height == last_height:
+            logging.debug("No new content loaded after scrolling. Ending scroll.")
             break
-        
-        # Log progress every 10 scrolls
-        if scroll % 10 == 0:
-            logging.info(f"Completed {scroll} scrolls out of {max_scrolls}")
-    
+        last_height = new_height
     else:
         logging.warning(f"Reached maximum scroll attempts ({max_scrolls}) without exhausting content.")
 
 
-def click_load_more(driver):
+def get_all_button_texts(driver):
     """
-    Clicks the 'Load More' button until it's no longer present.
+    Retrieves and logs all button texts on the page for debugging purposes.
     """
-    while True:
+    buttons = driver.find_elements(By.TAG_NAME, "button")
+    logging.info(f"Total buttons found: {len(buttons)}")
+    for index, button in enumerate(buttons, start=1):
         try:
-            load_more_button = WebDriverWait(driver, 5).until(
-                EC.element_to_be_clickable((By.CSS_SELECTOR, "button.load-more"))
-            )
-            load_more_button.click()
-            logging.debug("Clicked 'Load More' button.")
-            time.sleep(2)  # Wait for content to load
-        except TimeoutException:
-            logging.debug("No more 'Load More' buttons found.")
-            break
+            text = button.text.strip()
+            logging.debug(f"Button {index}: '{text}'")
         except Exception as e:
-            logging.error(f"Error clicking 'Load More' button: {e}")
-            break
+            logging.error(f"Error retrieving text for button {index}: {e}")
 
 
 def dismiss_popups(driver):
@@ -93,9 +77,9 @@ def dismiss_popups(driver):
     Identifies and dismisses pop-ups like cookie consent forms or sign-in prompts.
     """
     try:
-        # Example: Dismiss cookie consent
-        consent_button = WebDriverWait(driver, 5).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, "button.cookie-consent-accept"))
+        # Dismiss cookie consent
+        consent_button = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//button[contains(text(),'Accept') or contains(text(),'I Agree')]"))
         )
         consent_button.click()
         logging.debug("Dismissed cookie consent form.")
@@ -106,9 +90,9 @@ def dismiss_popups(driver):
         logging.error(f"Error dismissing cookie consent form: {e}")
 
     try:
-        # Example: Close sign-in prompt
-        signin_close_button = WebDriverWait(driver, 5).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, "button.signin-prompt-close"))
+        # Close sign-in prompt if any
+        signin_close_button = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//button[contains(text(),'Close') or contains(text(),'No Thanks')]"))
         )
         signin_close_button.click()
         logging.debug("Closed sign-in prompt.")
@@ -158,99 +142,86 @@ def scrape_prime():
     try:
         # 2. Navigate to Prime Gaming home page
         driver.get(url)
+        logging.debug("Navigated to Prime Gaming homepage.")
         time.sleep(5)  # Allow initial page load
 
         # 3. Dismiss any pop-ups
         dismiss_popups(driver)
 
         # 4. Dynamic Scrolling
-        incremental_scroll(driver, pause_time=3, scroll_increment=1000, max_scrolls=100)
+        incremental_scroll(driver, pause_time=3, max_scrolls=100)
 
-        # 5. Handle "Load More" buttons if present
-        click_load_more(driver)
+        # 4a. Optional: Get all button texts for debugging
+        # Uncomment the next line if you need to log all button texts
+        # get_all_button_texts(driver)
 
-        # 6. Save full page source for debugging
+        # 5. Save full page source for debugging
         with open('full_page_source.html', 'w', encoding='utf-8') as f:
             f.write(driver.page_source)
         logging.debug("Saved full page source to 'full_page_source.html'")
 
-        # 7. Wait for game cards to load
-        WebDriverWait(driver, 30).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, "div.item-card-details"))
-        )
+        # 6. Locate all "Claim" buttons using data-a-target attribute
+        claim_buttons = driver.find_elements(By.CSS_SELECTOR, "button[data-a-target='FGWPOffer']")
+        logging.info(f"Found {len(claim_buttons)} 'Claim' buttons.")
 
-        # 8. Locate all game cards
-        game_cards = driver.find_elements(By.CSS_SELECTOR, "div.item-card-details")
-        logging.info(f"Found {len(game_cards)} game cards with class 'item-card-details'.")
+        if not claim_buttons:
+            logging.warning("No 'Claim' buttons found. The page structure might have changed.")
+            return prime_freebies
 
-        # 9. Iterate through each game card
-        for index, card in enumerate(game_cards, start=1):
+        # 7. Iterate through each "Claim" button to extract game details
+        for index, button in enumerate(claim_buttons, start=1):
             try:
-                # (A) Check for the presence of the "Claim" button
-                claim_button = card.find_element(By.CSS_SELECTOR, 'button[data-a-target="FGWPOffer"]')
+                # Scroll the button into view
+                driver.execute_script("arguments[0].scrollIntoView();", button)
+                time.sleep(1)  # Allow any lazy-loaded content to appear
 
-                # (B) If found, extract the game title
-                title_elem = card.find_element(By.CSS_SELECTOR, "h3.tw-amazon-ember-bold")
-                game_title = title_elem.get_attribute("title").strip().lower()  # Normalize title
-
-                # Avoid duplicates
-                if game_title in seen_titles:
-                    logging.debug(f"Duplicate found: {game_title}. Skipping.")
+                # Extract the game title from the aria-label attribute
+                aria_label = button.get_attribute("aria-label")
+                if not aria_label:
+                    logging.debug(f"Button {index} has no aria-label. Skipping.")
                     continue
-                seen_titles.add(game_title)
+                game_title = aria_label.replace("Claim ", "").strip()
 
-                # (C) Extract the game link
-                # Primary attempt: Find a parent <a> tag
+                # Extract the game link
                 try:
-                    parent_a = card.find_element(By.XPATH, ".//ancestor::a[@href]")
+                    parent_a = button.find_element(By.XPATH, ".//ancestor::a[@href]")
                     game_link = parent_a.get_attribute("href")
                     if not game_link.startswith("http"):
                         game_link = "https://gaming.amazon.com" + game_link
                 except NoSuchElementException:
-                    # Secondary attempt: Find any nested <a> tag within the card
-                    try:
-                        nested_a = card.find_element(By.CSS_SELECTOR, "a[href]")
-                        game_link = nested_a.get_attribute("href")
-                        if not game_link.startswith("http"):
-                            game_link = "https://gaming.amazon.com" + game_link
-                    except NoSuchElementException:
-                        # Tertiary attempt: Extract from 'onclick' attribute of the 'Claim' button
-                        try:
-                            onclick_attr = claim_button.get_attribute("onclick")
-                            match = re.search(r"window\.location\.href='(.*?)'", onclick_attr)
-                            if match:
-                                game_link = match.group(1)
-                            else:
-                                game_link = url  # Fallback
-                        except Exception as e:
-                            # Fallback: Use the main Prime Gaming URL
-                            game_link = url
-                            logging.debug(f"Unable to extract specific link for '{game_title}'. Using home URL as fallback.")
+                    # If no ancestor <a> tag is found, use the main URL as a fallback
+                    game_link = url
+                    logging.debug(f"Unable to extract specific link for '{game_title}'. Using home URL as fallback.")
 
-                # (D) Append to the freebies list
+                # Avoid duplicates
+                if game_title.lower() in seen_titles:
+                    logging.debug(f"Duplicate found: {game_title}. Skipping.")
+                    continue
+                seen_titles.add(game_title.lower())
+
+                # Append to the freebies list
                 prime_freebies.append({
-                    "title": title_elem.text.strip(),
+                    "title": game_title,
                     "link": game_link
                 })
 
-                logging.debug(f"#{index} FREEBIE: {title_elem.text.strip()} | Link: {game_link}")
+                logging.debug(f"#{index} FREEBIE: {game_title} | Link: {game_link}")
 
-            except NoSuchElementException:
-                # If "Claim" button not found, it's not a free game
+            except NoSuchElementException as e:
+                logging.error(f"Error parsing game card #{index}: {e}")
                 continue
-            except StaleElementReferenceException:
-                # Handle cases where the DOM has changed during scraping
-                logging.debug(f"StaleElementReferenceException for card #{index}. Skipping.")
+            except StaleElementReferenceException as e:
+                logging.error(f"StaleElementReferenceException for game card #{index}: {e}")
                 continue
             except Exception as e:
                 # Capture screenshot for debugging
                 screenshot_name = f'error_card_{index}.png'
                 driver.save_screenshot(screenshot_name)
-                logging.error(f"Error parsing game card #{index}: {e}. Screenshot saved as '{screenshot_name}'")
+                logging.error(f"Unexpected error parsing game card #{index}: {e}. Screenshot saved as '{screenshot_name}'")
                 continue
 
     except TimeoutException:
-        logging.error("Timeout: Prime Gaming page took too long to load or items did not appear.")
+        logging.error("Timeout: Prime Gaming page took too long to load or elements did not appear.")
     except Exception as ex:
         logging.error(f"Unexpected exception: {ex}")
     finally:
