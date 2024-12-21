@@ -1,11 +1,19 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 import time
 
 def scrape_prime_free_games():
-    # Initialize the WebDriver (adjust the path to your driver if needed)
-    driver = webdriver.Chrome()
+    # Initialize the WebDriver using ChromeDriverManager
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless")  # Run in headless mode for GitHub Actions
+    options.add_argument("--disable-gpu")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     driver.get("https://gaming.amazon.com/home")
     time.sleep(5)  # Allow page to load
 
