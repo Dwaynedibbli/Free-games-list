@@ -1,5 +1,6 @@
 # scrapers/prime_gaming_scraper.py
 
+import os
 import time
 import re
 import logging
@@ -16,7 +17,6 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-
 def setup_logging():
     """
     Sets up logging for the scraper.
@@ -28,7 +28,6 @@ def setup_logging():
         level=logging.DEBUG
     )
     logging.getLogger().addHandler(logging.StreamHandler())  # Also log to console
-
 
 def incremental_scroll(driver, pause_time=1, scroll_increment=1000, max_scrolls=100):
     """
@@ -64,8 +63,26 @@ def incremental_scroll(driver, pause_time=1, scroll_increment=1000, max_scrolls=
             logging.info(f"Completed {scroll + 1} scrolls out of {max_scrolls}")
     
     else:
-        logging.warning(f"Reached maximum scroll attempts ({max_scrolls}) without fully loading the page.")
+        logging.warning(f"Reached maximum scroll attempts ({max_scrolls}) without exhausting content.")
 
+def click_load_more(driver):
+    """
+    Clicks the 'Load More' button until it's no longer present.
+    """
+    while True:
+        try:
+            load_more_button = WebDriverWait(driver, 5).until(
+                EC.element_to_be_clickable((By.CSS_SELECTOR, "button.load-more"))
+            )
+            load_more_button.click()
+            logging.debug("Clicked 'Load More' button.")
+            time.sleep(2)  # Wait for content to load
+        except TimeoutException:
+            logging.debug("No more 'Load More' buttons found.")
+            break
+        except Exception as e:
+            logging.error(f"Error clicking 'Load More' button: {e}")
+            break
 
 def dismiss_popups(driver):
     """
@@ -97,6 +114,30 @@ def dismiss_popups(driver):
     except Exception as e:
         logging.error(f"Error closing sign-in prompt: {e}")
 
+def login_amazon(driver, email, password):
+    """
+    Automates the Amazon login process.
+    
+    :param driver: Selenium WebDriver instance
+    :param email: Amazon account email
+    :param password: Amazon account password
+    """
+    try:
+        driver.get("https://www.amazon.com/ap/signin")
+        logging.debug("Navigated to Amazon sign-in page.")
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "ap_email"))
+        ).send_keys(email)
+        driver.find_element(By.ID, "continue").click()
+        logging.debug("Entered email and clicked continue.")
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "ap_password"))
+        ).send_keys(password)
+        driver.find_element(By.ID, "signInSubmit").click()
+        logging.debug("Entered password and submitted login form.")
+        time.sleep(5)  # Wait for login to complete
+    except Exception as e:
+        logging.error(f"Error during Amazon login: {e}")
 
 def scrape_prime():
     """
@@ -135,31 +176,45 @@ def scrape_prime():
     seen_titles = set()  # To track unique game titles
 
     try:
-        # 2. Navigate to Prime Gaming home page
+        # 2. Log in to Amazon
+        email = os.getenv("AMAZON_EMAIL")
+        password = os.getenv("AMAZON_PASSWORD")
+        
+        if not email or not password:
+            logging.error("Amazon credentials not found. Please set AMAZON_EMAIL and AMAZON_PASSWORD as GitHub Secrets.")
+            return prime_freebies
+        
+        login_amazon(driver, email, password)
+
+        # 3. Navigate to Prime Gaming home page
         driver.get(url)
+        logging.debug("Navigated to Prime Gaming homepage.")
         time.sleep(5)  # Allow initial page load
 
-        # 3. Dismiss any pop-ups
+        # 4. Dismiss any pop-ups
         dismiss_popups(driver)
 
-        # 4. Dynamic Scrolling
+        # 5. Dynamic Scrolling
         incremental_scroll(driver, pause_time=3, scroll_increment=1000, max_scrolls=100)
 
-        # 5. Save full page source for debugging
+        # 6. Handle "Load More" buttons if present
+        click_load_more(driver)
+
+        # 7. Save full page source for debugging
         with open('full_page_source.html', 'w', encoding='utf-8') as f:
             f.write(driver.page_source)
         logging.debug("Saved full page source to 'full_page_source.html'")
 
-        # 6. Wait for game cards to load
+        # 8. Wait for game cards to load
         WebDriverWait(driver, 30).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "div.item-card-details"))
         )
 
-        # 7. Locate all game cards
+        # 9. Locate all game cards
         game_cards = driver.find_elements(By.CSS_SELECTOR, "div.item-card-details")
         logging.info(f"Found {len(game_cards)} game cards with class 'item-card-details'.")
 
-        # 8. Iterate through each game card
+        # 10. Iterate through each game card
         for index, card in enumerate(game_cards, start=1):
             try:
                 # (A) Check for the presence of the "Claim" button
@@ -235,10 +290,8 @@ def scrape_prime():
     logging.info(f"Found total of {len(prime_freebies)} freebies on Prime Gaming.\n")
     return prime_freebies
 
-
 # Configure logging
 setup_logging()
-
 
 # Run the scraper locally for testing
 if __name__ == "__main__":
