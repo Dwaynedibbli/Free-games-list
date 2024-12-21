@@ -40,15 +40,15 @@ def incremental_scroll(driver, pause_time=2, max_scrolls=100):
     last_height = driver.execute_script("return document.body.scrollHeight")
     logging.debug(f"Initial page height: {last_height}")
     
-    for scroll in range(max_scrolls):
+    for scroll in range(1, max_scrolls + 1):
         # Scroll to the bottom of the page
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        logging.debug(f"Scrolled to bottom: Attempt {scroll + 1}/{max_scrolls}")
+        logging.debug(f"Scrolled to bottom: Attempt {scroll}/{max_scrolls}")
         time.sleep(pause_time)
         
         # Calculate new scroll height and compare with last scroll height
         new_height = driver.execute_script("return document.body.scrollHeight")
-        logging.debug(f"New page height after scroll {scroll + 1}: {new_height}")
+        logging.debug(f"New page height after scroll {scroll}: {new_height}")
         
         if new_height == last_height:
             logging.debug("No new content loaded after scrolling. Ending scroll.")
@@ -192,7 +192,7 @@ def scrape_prime():
         dismiss_popups(driver)
 
         # 5. Dynamic Scrolling
-        incremental_scroll(driver, pause_time=3, scroll_increment=1000, max_scrolls=100)
+        incremental_scroll(driver, pause_time=3, max_scrolls=100)
 
         # 6. Handle "Load More" buttons if present
         click_load_more(driver)
