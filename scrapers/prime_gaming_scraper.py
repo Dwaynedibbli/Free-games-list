@@ -6,11 +6,14 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.common.exceptions import (
-    NoSuchElementException, TimeoutException, StaleElementReferenceException
+    NoSuchElementException,
+    TimeoutException,
+    StaleElementReferenceException
 )
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+
 
 def scrape_prime():
     """
@@ -21,9 +24,9 @@ def scrape_prime():
     url = "https://gaming.amazon.com/home"
     print(f"\n[DEBUG] Navigating to: {url}\n")
 
-    # 1. Set up Headless Chrome Options
+    # 1. Set up Chrome Options
     options = Options()
-    options.add_argument("--headless")  # Run in headless mode
+    options.add_argument("--headless")  # Run in headless mode; comment out for debugging
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-gpu")
@@ -45,16 +48,16 @@ def scrape_prime():
     )
 
     prime_freebies = []
-    seen_titles = set()  # To avoid duplicates
+    seen_titles = set()  # To track unique game titles
 
     try:
-        # 2. Navigate to the Prime Gaming home page
+        # 2. Navigate to Prime Gaming home page
         driver.get(url)
-        time.sleep(5)  # Allow the page to load
+        time.sleep(5)  # Allow initial page load
 
-        # 3. Dynamic Scrolling: Scroll until no new games load
+        # 3. Dynamic Scrolling: Scroll until all games are loaded
         scroll_pause_time = 3
-        max_scroll_attempts = 30
+        max_scroll_attempts = 50  # Increased to ensure full page load
         last_height = driver.execute_script("return document.body.scrollHeight")
         scroll_attempts = 0
 
@@ -74,7 +77,7 @@ def scrape_prime():
             scroll_attempts += 1
 
         # 4. Wait for game cards to load
-        WebDriverWait(driver, 20).until(
+        WebDriverWait(driver, 30).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "div.item-card-details"))
         )
 
@@ -87,7 +90,7 @@ def scrape_prime():
             try:
                 # (A) Check for the presence of the "Claim" button
                 claim_button = card.find_element(By.CSS_SELECTOR, 'button[data-a-target="FGWPOffer"]')
-                
+
                 # (B) If found, extract the game title
                 title_elem = card.find_element(By.CSS_SELECTOR, "h3.tw-amazon-ember-bold")
                 game_title = title_elem.get_attribute("title").strip()
@@ -106,7 +109,7 @@ def scrape_prime():
                     if not game_link.startswith("http"):
                         game_link = "https://gaming.amazon.com" + game_link
                 except NoSuchElementException:
-                    # Secondary attempt: Find any nested <a> tag
+                    # Secondary attempt: Find any nested <a> tag within the card
                     try:
                         nested_a = card.find_element(By.CSS_SELECTOR, "a[href]")
                         game_link = nested_a.get_attribute("href")
@@ -117,6 +120,7 @@ def scrape_prime():
                         game_link = url
                         print(f"[DEBUG] No specific link found for '{game_title}'. Using home URL as fallback.")
 
+                # (D) Append to the freebies list
                 prime_freebies.append({
                     "title": game_title,
                     "link": game_link
@@ -144,6 +148,7 @@ def scrape_prime():
 
     print(f"\n[DEBUG] Found total of {len(prime_freebies)} freebies on Prime Gaming.\n")
     return prime_freebies
+
 
 # Run the scraper locally for testing
 if __name__ == "__main__":
