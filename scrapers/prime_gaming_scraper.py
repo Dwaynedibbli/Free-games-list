@@ -12,12 +12,12 @@ def scrape_prime():
     options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
-    
+
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     driver.get("https://gaming.amazon.com/home")
     time.sleep(5)  # Allow page to load
 
-    free_games = {}
+    free_games = []
 
     try:
         # Handle the cookie banner if it exists
@@ -49,8 +49,8 @@ def scrape_prime():
                 link_element = card.find_element(By.CSS_SELECTOR, "a[data-a-target='FGWPOffer']")
                 link = link_element.get_attribute("href")
 
-                # Add to the dictionary to avoid duplicates
-                free_games[title] = link
+                # Add the game to the list
+                free_games.append({"title": title, "link": link})
             except Exception as e:
                 print(f"Failed to extract title or link for a game: {e}")
 
