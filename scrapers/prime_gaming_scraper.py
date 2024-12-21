@@ -72,7 +72,7 @@ def click_load_more(driver):
     while True:
         try:
             load_more_button = WebDriverWait(driver, 5).until(
-                EC.element_to_be_clickable((By.XPATH, "//button[contains(text(),'Load More')]"))
+                EC.element_to_be_clickable((By.XPATH, "//button[contains(text(),'Load More') or contains(text(),'Show More')]"))
             )
             load_more_button.click()
             logging.debug("Clicked 'Load More' button.")
@@ -91,7 +91,7 @@ def dismiss_popups(driver):
     try:
         # Dismiss cookie consent
         consent_button = WebDriverWait(driver, 5).until(
-            EC.element_to_be_clickable((By.XPATH, "//button[contains(text(),'Accept')]"))
+            EC.element_to_be_clickable((By.XPATH, "//button[contains(text(),'Accept') or contains(text(),'I Agree')]"))
         )
         consent_button.click()
         logging.debug("Dismissed cookie consent form.")
@@ -104,7 +104,7 @@ def dismiss_popups(driver):
     try:
         # Close sign-in prompt
         signin_close_button = WebDriverWait(driver, 5).until(
-            EC.element_to_be_clickable((By.XPATH, "//button[contains(text(),'Close')]"))
+            EC.element_to_be_clickable((By.XPATH, "//button[contains(text(),'Close') or contains(text(),'No Thanks')]"))
         )
         signin_close_button.click()
         logging.debug("Closed sign-in prompt.")
@@ -268,8 +268,10 @@ def scrape_prime():
                 logging.debug(f"#{index} FREEBIE: {title_elem.text.strip()} | Link: {game_link}")
 
             except NoSuchElementException:
+                # If "Claim" button not found, it's not a free game
                 continue
             except StaleElementReferenceException:
+                # Handle cases where the DOM has changed during scraping
                 logging.debug(f"StaleElementReferenceException for card #{index}. Skipping.")
                 continue
             except Exception as e:
