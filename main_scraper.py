@@ -2,6 +2,7 @@ from scrapers.steam_scraper import scrape_steam
 from scrapers.gog_scraper import scrape_gog
 from scrapers.epic_scraper import scrape_epic
 from scrapers.google_play_scraper import scrape_google_play  # Import Google Play scraper
+from scrapers.prime_gaming_scraper import scrape_prime       # ← New Prime Gaming scraper
 from scrapers.save_to_file import save_to_file
 from datetime import datetime
 
@@ -18,12 +19,17 @@ if __name__ == "__main__":
     # Run the Google Play scraper
     google_play_games = scrape_google_play()
 
-    # Ensure that Steam, GOG, Epic, and Google Play are always listed, even if no games are available
+    # Run the Prime Gaming scraper
+    prime_gaming_games = scrape_prime()
+
+    # Ensure that Steam, GOG, Epic, Google Play, and Prime Gaming are always listed, 
+    # even if no games are available
     games_by_platform = {
         "Steam": steam_games if steam_games else [],
         "GOG": gog_games if gog_games else [],
         "Epic": epic_games if epic_games else [],
-        "Google Play": google_play_games if google_play_games else []  # Add Google Play Games
+        "Google Play": google_play_games if google_play_games else [],
+        "Prime Gaming": prime_gaming_games if prime_gaming_games else []  # ← Add Prime Gaming
     }
 
     # Save the scraped data to index.html
@@ -112,6 +118,25 @@ if __name__ == "__main__":
         f.write('            <div class="game-list">\n')
         if games_by_platform["Google Play"]:
             for game in games_by_platform["Google Play"]:
+                title = game['title']
+                link = game['link']
+                f.write(f'            <div class="game-item">\n')
+                f.write(f'                <a href="{link}">{title}</a><br>\n')
+                f.write('            </div>\n')
+        else:
+            f.write('            <p>No free games available today.</p>\n')
+        f.write('            </div>\n')
+        f.write('        </div>\n')
+
+        # Column 5 (Prime Gaming)
+        f.write('        <div class="platform-column">\n')
+        f.write('            <div class="banner-ad">\n')
+        f.write('                <p>Banner Ad</p>\n')
+        f.write('            </div>\n')
+        f.write('            <h2>Prime Gaming</h2>\n')
+        f.write('            <div class="game-list">\n')
+        if games_by_platform["Prime Gaming"]:
+            for game in games_by_platform["Prime Gaming"]:
                 title = game['title']
                 link = game['link']
                 f.write(f'            <div class="game-item">\n')
