@@ -1,120 +1,62 @@
-import time
-import logging
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import NoSuchElementException, TimeoutException
-from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.action_chains import ActionChains
+import time
 
+def scrape_prime_free_games():
+    # Initialize the WebDriver (adjust the path to your driver if needed)
+    driver = webdriver.Chrome()
+    driver.get("https://gaming.amazon.com/home")
+    time.sleep(5)  # Allow page to load
 
-def setup_logging():
-    """
-    Sets up logging for the scraper.
-    """
-    logging.basicConfig(
-        filename='prime_gaming_debug.log',
-        filemode='w',
-        format='%(asctime)s - %(levelname)s - %(message)s',
-        level=logging.DEBUG
-    )
-    logging.getLogger().addHandler(logging.StreamHandler())  # Log to console as well
-
-
-def initialize_driver():
-    """
-    Initializes the Selenium WebDriver with the necessary options.
-    """
-    options = Options()
-    options.add_argument("--headless")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--disable-gpu")
-    options.add_argument("--window-size=1920,1080")
-    options.add_argument("--disable-features=AutomationControlled")
-    options.add_experimental_option("excludeSwitches", ["enable-automation"])
-    options.add_experimental_option("useAutomationExtension", False)
-    return webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-
-
-def incremental_scroll(driver, pause_time=2, max_scrolls=50):
-    """
-    Incrementally scrolls the page to ensure all dynamic content is loaded.
-    """
-    last_height = driver.execute_script("return document.body.scrollHeight")
-    for scroll in range(max_scrolls):
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(pause_time)
-        new_height = driver.execute_script("return document.body.scrollHeight")
-        if new_height == last_height:
-            logging.debug("No more content to load after scrolling.")
-            break
-        last_height = new_height
-    else:
-        logging.warning("Max scrolls reached without exhausting content.")
-
-
-def scrape_prime():
-    """
-    Scrapes Prime Gaming freebies and ensures no duplicate entries.
-    """
-    url = "https://gaming.amazon.com/home"
-    logging.debug(f"Navigating to: {url}")
-
-    driver = initialize_driver()
-    freebies = {}
+    free_games = {}
 
     try:
-        driver.get(url)
-        time.sleep(5)  # Allow the page to load
+        # Handle the cookie banner if it exists
+        try:
+            cookie_banner = driver.find_element(By.CSS_SELECTOR, "div[data-a-target='cookie-policy-banner']")
+            if cookie_banner.is_displayed():
+                close_button = cookie_banner.find_element(By.XPATH, ".//button")
+                close_button.click()
+                time.sleep(2)  # Wait for banner to disappear
+        except Exception as e:
+            print(f"No cookie banner found or unable to close: {e}")
 
-        incremental_scroll(driver)
+        # Locate the free games tab and click
+        free_games_tab = driver.find_element(By.XPATH, "//p[contains(text(), 'Free games')]")
+        driver.execute_script("arguments[0].scrollIntoView();", free_games_tab)  # Ensure it's visible
+        ActionChains(driver).move_to_element(free_games_tab).click().perform()
+        time.sleep(3)  # Allow time for the games to load
 
-        # Locate claimable items
-        claim_buttons = driver.find_elements(By.XPATH, "//button[contains(@aria-label, 'Claim')]")
-        logging.info(f"Found {len(claim_buttons)} 'Claim' buttons.")
-
-        for button in claim_buttons:
+        # Locate all game cards
+        game_cards = driver.find_elements(By.CSS_SELECTOR, "div.item-card-details")
+        
+        for card in game_cards:
             try:
-                # Scroll to the button
-                driver.execute_script("arguments[0].scrollIntoView();", button)
-                time.sleep(1)
+                # Extract the title
+                title_element = card.find_element(By.CSS_SELECTOR, "h3.tw-bold")
+                title = title_element.get_attribute("title")
 
-                # Extract game title from the button's aria-label
-                aria_label = button.get_attribute("aria-label")
-                if not aria_label:
-                    continue
-                game_title = aria_label.replace("Claim ", "").strip()
-
-                # Find the link to the game
-                parent_element = button.find_element(By.XPATH, "./ancestor::a[@href]")
-                game_link = parent_element.get_attribute("href")
+                # Extract the link
+                link_element = card.find_element(By.CSS_SELECTOR, "a[data-a-target='FGWPOffer']")
+                link = link_element.get_attribute("href")
 
                 # Add to the dictionary to avoid duplicates
-                if game_title not in freebies:
-                    freebies[game_title] = game_link
-                    logging.debug(f"Added freebie: {game_title} => {game_link}")
-                else:
-                    logging.debug(f"Duplicate freebie skipped: {game_title}")
-
-            except NoSuchElementException:
-                logging.warning("Could not locate parent link for a button.")
-                continue
+                free_games[title] = link
+            except Exception as e:
+                print(f"Failed to extract title or link for a game: {e}")
 
     except Exception as e:
-        logging.error(f"An error occurred: {e}")
+        print(f"Error navigating to Free Games tab: {e}")
+
     finally:
         driver.quit()
 
-    logging.info(f"Total unique freebies found: {len(freebies)}")
-    return [{"title": title, "link": link} for title, link in freebies.items()]
-
+    return free_games
 
 if __name__ == "__main__":
-    setup_logging()
-    prime_games = scrape_prime()
-    print("\nPrime Gaming freebies found:")
-    for game in prime_games:
-        print(f" - {game['title']} => {game['link']}")
+    games = scrape_prime_free_games()
+    print("\n=== Free Games List ===")
+    for index, (title, link) in enumerate(games.items(), start=1):
+        print(f"{index}. {title} => {link}")
+    print(f"\n=== Total Games Found: {len(games)} ===")
