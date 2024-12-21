@@ -1,11 +1,11 @@
-name: Daily Scrape
+name: Hourly Scrape
 
 on:
-  schedule: 
-    - cron: '0 4 * * *'   # 12 AM Eastern Time (UTC-4)
-    - cron: '0 7 * * *'   # 12 AM Pacific Time (UTC-7)
-    - cron: '0 6 * * *'   # 12 AM Central Time (UTC-6)
-  workflow_dispatch:       # Allows manual trigger from the Actions tab
+  # Run every hour at minute 0
+  schedule:
+    - cron: '0 * * * *'
+  # Allows manual run from GitHub Actions tab
+  workflow_dispatch:
 
 jobs:
   scrape:
@@ -38,7 +38,7 @@ jobs:
         git config --global user.name 'dwaynedibbli'
         git config --global user.email 'geoffknight83@gmail.com'
         git add index.html
-        git commit -m "Daily update of free games list" || echo "No changes to commit"
+        git commit -m "Hourly update of free games list" || echo "No changes to commit"
         git push
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
