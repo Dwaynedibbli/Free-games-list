@@ -35,10 +35,6 @@ jobs:
 
     - name: Run main scraper with Xvfb
       run: |
-        # Option A: Just run python if you’re using normal headless flags
-        # python main_scraper.py
-        
-        # Option B: If you still have issues, try forcing an X display:
         xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' python main_scraper.py
 
     - name: Commit and push changes
