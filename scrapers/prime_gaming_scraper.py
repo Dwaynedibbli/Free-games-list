@@ -91,7 +91,7 @@ def dismiss_popups(driver):
     try:
         # Example: Dismiss cookie consent
         consent_button = WebDriverWait(driver, 5).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, "button.cookie-consent-accept"))
+            EC.element_to_be_clickable((By.XPATH, "//button[contains(text(),'Accept')]"))
         )
         consent_button.click()
         logging.debug("Dismissed cookie consent form.")
@@ -104,7 +104,7 @@ def dismiss_popups(driver):
     try:
         # Example: Close sign-in prompt
         signin_close_button = WebDriverWait(driver, 5).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, "button.signin-prompt-close"))
+            EC.element_to_be_clickable((By.XPATH, "//button[contains(text(),'Close')]"))
         )
         signin_close_button.click()
         logging.debug("Closed sign-in prompt.")
@@ -150,7 +150,7 @@ def scrape_prime():
 
     # 1. Set up Chrome Options
     options = Options()
-    options.add_argument("--headless")  
+    options.add_argument("--headless")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-gpu")
