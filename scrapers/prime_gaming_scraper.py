@@ -1,6 +1,8 @@
 # scrapers/prime_gaming_scraper.py
 
 import time
+import re
+import logging
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
@@ -22,7 +24,7 @@ def scrape_prime():
     Returns a list of dictionaries with 'title' and 'link'.
     """
     url = "https://gaming.amazon.com/home"
-    print(f"\n[DEBUG] Navigating to: {url}\n")
+    logging.debug(f"Navigating to: {url}")
 
     # 1. Set up Chrome Options
     options = Options()
@@ -55,7 +57,20 @@ def scrape_prime():
         driver.get(url)
         time.sleep(5)  # Allow initial page load
 
-        # 3. Dynamic Scrolling: Scroll until all games are loaded
+        # 3. Handle "Load More" buttons if present (optional)
+        # Uncomment and adjust if Prime Gaming uses "Load More" buttons
+        """
+        try:
+            while True:
+                load_more_button = driver.find_element(By.CSS_SELECTOR, 'button.load-more')
+                load_more_button.click()
+                logging.debug("Clicked 'Load More' button.")
+                time.sleep(3)  # Wait for content to load
+        except NoSuchElementException:
+            logging.debug("No more 'Load More' buttons found.")
+        """
+
+        # 4. Dynamic Scrolling: Scroll until all games are loaded
         scroll_pause_time = 3
         max_scroll_attempts = 50  # Increased to ensure full page load
         last_height = driver.execute_script("return document.body.scrollHeight")
@@ -64,28 +79,28 @@ def scrape_prime():
         while scroll_attempts < max_scroll_attempts:
             # Scroll down to bottom
             driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            print(f"[DEBUG] Scrolled to bottom: Attempt {scroll_attempts + 1}")
+            logging.debug(f"Scrolled to bottom: Attempt {scroll_attempts + 1}")
             # Wait to load page
             time.sleep(scroll_pause_time)
             # Calculate new scroll height and compare with last scroll height
             new_height = driver.execute_script("return document.body.scrollHeight")
             if new_height == last_height:
                 # If heights are the same, assume no more content
-                print("[DEBUG] Reached end of page.")
+                logging.debug("Reached end of page.")
                 break
             last_height = new_height
             scroll_attempts += 1
 
-        # 4. Wait for game cards to load
+        # 5. Wait for game cards to load
         WebDriverWait(driver, 30).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "div.item-card-details"))
         )
 
-        # 5. Locate all game cards
+        # 6. Locate all game cards
         game_cards = driver.find_elements(By.CSS_SELECTOR, "div.item-card-details")
-        print(f"[DEBUG] Found {len(game_cards)} game cards with class 'item-card-details'.")
+        logging.info(f"Found {len(game_cards)} game cards with class 'item-card-details'.")
 
-        # 6. Iterate through each game card
+        # 7. Iterate through each game card
         for index, card in enumerate(game_cards, start=1):
             try:
                 # (A) Check for the presence of the "Claim" button
@@ -97,7 +112,7 @@ def scrape_prime():
 
                 # Avoid duplicates
                 if game_title in seen_titles:
-                    print(f"[DEBUG] Duplicate found: {game_title}. Skipping.")
+                    logging.debug(f"Duplicate found: {game_title}. Skipping.")
                     continue
                 seen_titles.add(game_title)
 
@@ -116,9 +131,18 @@ def scrape_prime():
                         if not game_link.startswith("http"):
                             game_link = "https://gaming.amazon.com" + game_link
                     except NoSuchElementException:
-                        # Fallback: Use the main Prime Gaming URL
-                        game_link = url
-                        print(f"[DEBUG] No specific link found for '{game_title}'. Using home URL as fallback.")
+                        # Tertiary attempt: Extract from 'onclick' attribute of the 'Claim' button
+                        try:
+                            onclick_attr = claim_button.get_attribute("onclick")
+                            match = re.search(r"window\.location\.href='(.*?)'", onclick_attr)
+                            if match:
+                                game_link = match.group(1)
+                            else:
+                                game_link = url  # Fallback
+                        except Exception as e:
+                            # Fallback: Use the main Prime Gaming URL
+                            game_link = url
+                            logging.debug(f"Unable to extract specific link for '{game_title}'. Using home URL as fallback.")
 
                 # (D) Append to the freebies list
                 prime_freebies.append({
@@ -126,29 +150,37 @@ def scrape_prime():
                     "link": game_link
                 })
 
-                print(f"[DEBUG] #{index} FREEBIE: {game_title} | Link: {game_link}")
+                logging.debug(f"#{index} FREEBIE: {game_title} | Link: {game_link}")
 
             except NoSuchElementException:
                 # If "Claim" button not found, it's not a free game
                 continue
             except StaleElementReferenceException:
                 # Handle cases where the DOM has changed during scraping
-                print(f"[DEBUG] StaleElementReferenceException for card #{index}. Skipping.")
+                logging.debug(f"StaleElementReferenceException for card #{index}. Skipping.")
                 continue
             except Exception as e:
-                print(f"[DEBUG] Error parsing game card #{index}: {e}")
+                logging.error(f"Error parsing game card #{index}: {e}")
                 continue
 
     except TimeoutException:
-        print("[ERROR] Timeout: Prime Gaming page took too long to load or items did not appear.")
+        logging.error("Timeout: Prime Gaming page took too long to load or items did not appear.")
     except Exception as ex:
-        print(f"[ERROR] Unexpected exception: {ex}")
+        logging.error(f"Unexpected exception: {ex}")
     finally:
         driver.quit()
 
-    print(f"\n[DEBUG] Found total of {len(prime_freebies)} freebies on Prime Gaming.\n")
+    logging.info(f"Found total of {len(prime_freebies)} freebies on Prime Gaming.\n")
     return prime_freebies
 
+
+# Configure logging
+logging.basicConfig(
+    filename='prime_gaming_scraper.log',
+    filemode='a',
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    level=logging.DEBUG
+)
 
 # Run the scraper locally for testing
 if __name__ == "__main__":
