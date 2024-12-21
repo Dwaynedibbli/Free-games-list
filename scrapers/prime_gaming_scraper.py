@@ -29,7 +29,7 @@ def setup_logging():
     )
     logging.getLogger().addHandler(logging.StreamHandler())  # Also log to console
 
-def incremental_scroll(driver, pause_time=1, scroll_increment=1000, max_scrolls=100):
+def incremental_scroll(driver, pause_time=2, scroll_increment=1000, max_scrolls=100):
     """
     Scrolls the page incrementally to ensure all dynamic content loads.
     
@@ -72,7 +72,7 @@ def click_load_more(driver):
     while True:
         try:
             load_more_button = WebDriverWait(driver, 5).until(
-                EC.element_to_be_clickable((By.CSS_SELECTOR, "button.load-more"))
+                EC.element_to_be_clickable((By.XPATH, "//button[contains(text(),'Load More')]"))
             )
             load_more_button.click()
             logging.debug("Clicked 'Load More' button.")
@@ -89,7 +89,7 @@ def dismiss_popups(driver):
     Identifies and dismisses pop-ups like cookie consent forms or sign-in prompts.
     """
     try:
-        # Example: Dismiss cookie consent
+        # Dismiss cookie consent
         consent_button = WebDriverWait(driver, 5).until(
             EC.element_to_be_clickable((By.XPATH, "//button[contains(text(),'Accept')]"))
         )
@@ -102,7 +102,7 @@ def dismiss_popups(driver):
         logging.error(f"Error dismissing cookie consent form: {e}")
 
     try:
-        # Example: Close sign-in prompt
+        # Close sign-in prompt
         signin_close_button = WebDriverWait(driver, 5).until(
             EC.element_to_be_clickable((By.XPATH, "//button[contains(text(),'Close')]"))
         )
@@ -136,6 +136,12 @@ def login_amazon(driver, email, password):
         driver.find_element(By.ID, "signInSubmit").click()
         logging.debug("Entered password and submitted login form.")
         time.sleep(5)  # Wait for login to complete
+
+        # Verify login by checking presence of account element
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "nav-link-accountList"))
+        )
+        logging.debug("Successfully logged into Amazon account.")
     except Exception as e:
         logging.error(f"Error during Amazon login: {e}")
 
@@ -217,7 +223,7 @@ def scrape_prime():
         for index, card in enumerate(game_cards, start=1):
             try:
                 # (A) Check for the presence of the "Claim" button
-                claim_button = card.find_element(By.CSS_SELECTOR, 'button[data-a-target="FGWPOffer"]')
+                claim_button = card.find_element(By.XPATH, ".//button[contains(text(),'Claim')]")
 
                 # (B) If found, extract the game title
                 title_elem = card.find_element(By.CSS_SELECTOR, "h3.tw-amazon-ember-bold")
@@ -230,21 +236,18 @@ def scrape_prime():
                 seen_titles.add(game_title)
 
                 # (C) Extract the game link
-                # Primary attempt: Find a parent <a> tag
                 try:
                     parent_a = card.find_element(By.XPATH, ".//ancestor::a[@href]")
                     game_link = parent_a.get_attribute("href")
                     if not game_link.startswith("http"):
                         game_link = "https://gaming.amazon.com" + game_link
                 except NoSuchElementException:
-                    # Secondary attempt: Find any nested <a> tag within the card
                     try:
                         nested_a = card.find_element(By.CSS_SELECTOR, "a[href]")
                         game_link = nested_a.get_attribute("href")
                         if not game_link.startswith("http"):
                             game_link = "https://gaming.amazon.com" + game_link
                     except NoSuchElementException:
-                        # Tertiary attempt: Extract from 'onclick' attribute of the 'Claim' button
                         try:
                             onclick_attr = claim_button.get_attribute("onclick")
                             match = re.search(r"window\.location\.href='(.*?)'", onclick_attr)
@@ -253,7 +256,6 @@ def scrape_prime():
                             else:
                                 game_link = url  # Fallback
                         except Exception as e:
-                            # Fallback: Use the main Prime Gaming URL
                             game_link = url
                             logging.debug(f"Unable to extract specific link for '{game_title}'. Using home URL as fallback.")
 
@@ -266,10 +268,8 @@ def scrape_prime():
                 logging.debug(f"#{index} FREEBIE: {title_elem.text.strip()} | Link: {game_link}")
 
             except NoSuchElementException:
-                # If "Claim" button not found, it's not a free game
                 continue
             except StaleElementReferenceException:
-                # Handle cases where the DOM has changed during scraping
                 logging.debug(f"StaleElementReferenceException for card #{index}. Skipping.")
                 continue
             except Exception as e:
