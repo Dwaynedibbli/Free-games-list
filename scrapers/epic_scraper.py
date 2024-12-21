@@ -1,3 +1,5 @@
+import re  # <-- Added for post-processing
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
@@ -15,7 +17,9 @@ def scrape_epic():
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--window-size=1920,1080")
-    chrome_options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36")
+    chrome_options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                               "AppleWebKit/537.36 (KHTML, like Gecko) "
+                               "Chrome/85.0.4183.121 Safari/537.36")
 
     # Set up the Chrome WebDriver with the options
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
@@ -40,7 +44,15 @@ def scrape_epic():
         # Loop through the games and extract title and link
         for game in games:
             try:
-                title = game.text.strip()  # Directly extracting the text from the <a> element
+                title = game.text.strip()  # Raw title text
+
+                # 1. Remove "Free Now" (case-insensitive)
+                title = re.sub(r'(?i)free now', '', title)
+                # 2. Remove everything from the first dash onward (e.g., date/time)
+                title = re.sub(r'-.*', '', title)
+                # 3. Normalize whitespace
+                title = re.sub(r'\s+', ' ', title).strip()
+
                 link = game.get_attribute('href')
 
                 free_games.append({
