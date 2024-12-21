@@ -150,8 +150,7 @@ def scrape_prime():
 
     # 1. Set up Chrome Options
     options = Options()
-    # Uncomment the next line to see the browser in action (for debugging)
-    # options.add_argument("--headless")  
+    options.add_argument("--headless")  
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-gpu")
