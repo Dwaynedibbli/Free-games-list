@@ -17,6 +17,87 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 
+def setup_logging():
+    """
+    Sets up logging for the scraper.
+    """
+    logging.basicConfig(
+        filename='prime_gaming_scraper.log',
+        filemode='a',
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        level=logging.DEBUG
+    )
+    logging.getLogger().addHandler(logging.StreamHandler())  # Also log to console
+
+
+def incremental_scroll(driver, pause_time=1, scroll_increment=1000, max_scrolls=100):
+    """
+    Scrolls the page incrementally to ensure all dynamic content loads.
+    
+    :param driver: Selenium WebDriver instance
+    :param pause_time: Time to wait after each scroll (in seconds)
+    :param scroll_increment: Number of pixels to scroll each time
+    :param max_scrolls: Maximum number of scroll attempts to prevent infinite loops
+    """
+    last_height = driver.execute_script("return window.pageYOffset + window.innerHeight;")
+    total_height = driver.execute_script("return document.body.scrollHeight;")
+    
+    for scroll in range(max_scrolls):
+        # Scroll down by the specified increment
+        driver.execute_script(f"window.scrollBy(0, {scroll_increment});")
+        logging.debug(f"Scrolled down by {scroll_increment} pixels: Scroll {scroll + 1}/{max_scrolls}")
+        time.sleep(pause_time)
+        
+        # Calculate new scroll position and total height
+        new_scroll_position = driver.execute_script("return window.pageYOffset + window.innerHeight;")
+        new_total_height = driver.execute_script("return document.body.scrollHeight;")
+        
+        logging.debug(f"Current Scroll Position: {new_scroll_position} | Total Page Height: {new_total_height}")
+        
+        # Check if we've reached the bottom of the page
+        if new_scroll_position >= new_total_height:
+            logging.debug("Reached the bottom of the page.")
+            break
+        
+        # Optional: Log progress
+        if (scroll + 1) % 10 == 0:
+            logging.info(f"Completed {scroll + 1} scrolls out of {max_scrolls}")
+    
+    else:
+        logging.warning(f"Reached maximum scroll attempts ({max_scrolls}) without fully loading the page.")
+
+
+def dismiss_popups(driver):
+    """
+    Identifies and dismisses pop-ups like cookie consent forms or sign-in prompts.
+    """
+    try:
+        # Example: Dismiss cookie consent
+        consent_button = WebDriverWait(driver, 5).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "button.cookie-consent-accept"))
+        )
+        consent_button.click()
+        logging.debug("Dismissed cookie consent form.")
+        time.sleep(2)
+    except TimeoutException:
+        logging.debug("No cookie consent form found.")
+    except Exception as e:
+        logging.error(f"Error dismissing cookie consent form: {e}")
+
+    try:
+        # Example: Close sign-in prompt
+        signin_close_button = WebDriverWait(driver, 5).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "button.signin-prompt-close"))
+        )
+        signin_close_button.click()
+        logging.debug("Closed sign-in prompt.")
+        time.sleep(2)
+    except TimeoutException:
+        logging.debug("No sign-in prompt found.")
+    except Exception as e:
+        logging.error(f"Error closing sign-in prompt: {e}")
+
+
 def scrape_prime():
     """
     Scrapes Prime Gaming freebies on Amazon’s Prime Gaming page.
@@ -28,7 +109,8 @@ def scrape_prime():
 
     # 1. Set up Chrome Options
     options = Options()
-    #options.add_argument("--headless")  # Run in headless mode; comment out for debugging
+    # Uncomment the next line to see the browser in action (for debugging)
+    # options.add_argument("--headless")  
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-gpu")
@@ -57,50 +139,27 @@ def scrape_prime():
         driver.get(url)
         time.sleep(5)  # Allow initial page load
 
-        # 3. Handle "Load More" buttons if present (optional)
-        # Uncomment and adjust if Prime Gaming uses "Load More" buttons
-        """
-        try:
-            while True:
-                load_more_button = driver.find_element(By.CSS_SELECTOR, 'button.load-more')
-                load_more_button.click()
-                logging.debug("Clicked 'Load More' button.")
-                time.sleep(3)  # Wait for content to load
-        except NoSuchElementException:
-            logging.debug("No more 'Load More' buttons found.")
-        """
+        # 3. Dismiss any pop-ups
+        dismiss_popups(driver)
 
-        # 4. Dynamic Scrolling: Scroll until all games are loaded
-        scroll_pause_time = 3
-        max_scroll_attempts = 50  # Increased to ensure full page load
-        last_height = driver.execute_script("return document.body.scrollHeight")
-        scroll_attempts = 0
+        # 4. Dynamic Scrolling
+        incremental_scroll(driver, pause_time=3, scroll_increment=1000, max_scrolls=100)
 
-        while scroll_attempts < max_scroll_attempts:
-            # Scroll down to bottom
-            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            logging.debug(f"Scrolled to bottom: Attempt {scroll_attempts + 1}")
-            # Wait to load page
-            time.sleep(scroll_pause_time)
-            # Calculate new scroll height and compare with last scroll height
-            new_height = driver.execute_script("return document.body.scrollHeight")
-            if new_height == last_height:
-                # If heights are the same, assume no more content
-                logging.debug("Reached end of page.")
-                break
-            last_height = new_height
-            scroll_attempts += 1
+        # 5. Save full page source for debugging
+        with open('full_page_source.html', 'w', encoding='utf-8') as f:
+            f.write(driver.page_source)
+        logging.debug("Saved full page source to 'full_page_source.html'")
 
-        # 5. Wait for game cards to load
+        # 6. Wait for game cards to load
         WebDriverWait(driver, 30).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "div.item-card-details"))
         )
 
-        # 6. Locate all game cards
+        # 7. Locate all game cards
         game_cards = driver.find_elements(By.CSS_SELECTOR, "div.item-card-details")
         logging.info(f"Found {len(game_cards)} game cards with class 'item-card-details'.")
 
-        # 7. Iterate through each game card
+        # 8. Iterate through each game card
         for index, card in enumerate(game_cards, start=1):
             try:
                 # (A) Check for the presence of the "Claim" button
@@ -108,7 +167,7 @@ def scrape_prime():
 
                 # (B) If found, extract the game title
                 title_elem = card.find_element(By.CSS_SELECTOR, "h3.tw-amazon-ember-bold")
-                game_title = title_elem.get_attribute("title").strip()
+                game_title = title_elem.get_attribute("title").strip().lower()  # Normalize title
 
                 # Avoid duplicates
                 if game_title in seen_titles:
@@ -146,11 +205,11 @@ def scrape_prime():
 
                 # (D) Append to the freebies list
                 prime_freebies.append({
-                    "title": game_title,
+                    "title": title_elem.text.strip(),
                     "link": game_link
                 })
 
-                logging.debug(f"#{index} FREEBIE: {game_title} | Link: {game_link}")
+                logging.debug(f"#{index} FREEBIE: {title_elem.text.strip()} | Link: {game_link}")
 
             except NoSuchElementException:
                 # If "Claim" button not found, it's not a free game
@@ -160,7 +219,10 @@ def scrape_prime():
                 logging.debug(f"StaleElementReferenceException for card #{index}. Skipping.")
                 continue
             except Exception as e:
-                logging.error(f"Error parsing game card #{index}: {e}")
+                # Capture screenshot for debugging
+                screenshot_name = f'error_card_{index}.png'
+                driver.save_screenshot(screenshot_name)
+                logging.error(f"Error parsing game card #{index}: {e}. Screenshot saved as '{screenshot_name}'")
                 continue
 
     except TimeoutException:
@@ -175,12 +237,8 @@ def scrape_prime():
 
 
 # Configure logging
-logging.basicConfig(
-    filename='prime_gaming_scraper.log',
-    filemode='a',
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    level=logging.DEBUG
-)
+setup_logging()
+
 
 # Run the scraper locally for testing
 if __name__ == "__main__":
