@@ -29,39 +29,31 @@ def setup_logging():
     )
     logging.getLogger().addHandler(logging.StreamHandler())  # Also log to console
 
-def incremental_scroll(driver, pause_time=2, scroll_increment=1000, max_scrolls=100):
+def incremental_scroll(driver, pause_time=2, max_scrolls=100):
     """
-    Scrolls the page incrementally to ensure all dynamic content loads.
-
+    Scrolls the page to load all dynamic content until no new content is loaded.
+    
     :param driver: Selenium WebDriver instance
     :param pause_time: Time to wait after each scroll (in seconds)
-    :param scroll_increment: Number of pixels to scroll each time
     :param max_scrolls: Maximum number of scroll attempts to prevent infinite loops
     """
-    last_height = driver.execute_script("return window.pageYOffset + window.innerHeight;")
-    total_height = driver.execute_script("return document.body.scrollHeight;")
+    last_height = driver.execute_script("return document.body.scrollHeight")
+    logging.debug(f"Initial page height: {last_height}")
     
-    for scroll in range(1, max_scrolls + 1):
-        # Scroll down by the specified increment
-        driver.execute_script(f"window.scrollBy(0, {scroll_increment});")
-        logging.debug(f"Scrolled down by {scroll_increment} pixels: Scroll {scroll}/{max_scrolls}")
+    for scroll in range(max_scrolls):
+        # Scroll to the bottom of the page
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        logging.debug(f"Scrolled to bottom: Attempt {scroll + 1}/{max_scrolls}")
         time.sleep(pause_time)
         
-        # Calculate new scroll position and total height
-        new_scroll_position = driver.execute_script("return window.pageYOffset + window.innerHeight;")
-        new_total_height = driver.execute_script("return document.body.scrollHeight;")
+        # Calculate new scroll height and compare with last scroll height
+        new_height = driver.execute_script("return document.body.scrollHeight")
+        logging.debug(f"New page height after scroll {scroll + 1}: {new_height}")
         
-        logging.debug(f"Current Scroll Position: {new_scroll_position} | Total Page Height: {new_total_height}")
-        
-        # Check if we've reached the bottom of the page
-        if new_scroll_position >= new_total_height:
-            logging.debug("Reached the bottom of the page.")
+        if new_height == last_height:
+            logging.debug("No new content loaded after scrolling. Ending scroll.")
             break
-        
-        # Log progress every 10 scrolls
-        if scroll % 10 == 0:
-            logging.info(f"Completed {scroll} scrolls out of {max_scrolls}")
-    
+        last_height = new_height
     else:
         logging.warning(f"Reached maximum scroll attempts ({max_scrolls}) without exhausting content.")
 
