@@ -64,3 +64,24 @@ def save_to_file(games_by_platform):
             f.write('            <p>No free games available today.</p>\n')
         f.write('            </div>\n')  # End of Google Play game list
         f.write('        </div>\n')  # End of Google Play column
+
+        # ================================
+        # New: Prime Gaming Column
+        # ================================
+        f.write('        <div class="platform-column">\n')
+        f.write('            <h2>Prime Gaming</h2>\n')
+        f.write('            <div class="game-list">\n')
+        if games_by_platform["Prime Gaming"]:  # Must match your dictionary key
+            for game in games_by_platform["Prime Gaming"]:
+                # Assuming each game is a dict with 'title' and 'link'
+                title = game['title']
+                link = game['link']
+                f.write(f'            <div class="game-item">\n')
+                f.write(f'                <a href="{link}">{title}</a><br>\n')
+                f.write('            </div>\n')
+        else:
+            f.write('            <p>No free games available today.</p>\n')
+        f.write('            </div>\n')  # End of Prime Gaming game list
+        f.write('        </div>\n')  # End of Prime Gaming column
+
+        f.write('    </div>\n')  # End of platform-container
