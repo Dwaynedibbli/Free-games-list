@@ -6,7 +6,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.common.exceptions import (
-    NoSuchElementException, TimeoutException
+    NoSuchElementException, TimeoutException, StaleElementReferenceException
 )
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support.ui import WebDriverWait
@@ -34,6 +34,9 @@ def scrape_prime():
         "AppleWebKit/537.36 (KHTML, like Gecko) "
         "Chrome/110.0.5481.178 Safari/537.36"
     )
+    # Additional options to make headless less detectable
+    options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    options.add_experimental_option('useAutomationExtension', False)
 
     # Initialize WebDriver
     driver = webdriver.Chrome(
@@ -42,17 +45,33 @@ def scrape_prime():
     )
 
     prime_freebies = []
+    seen_titles = set()  # To avoid duplicates
 
     try:
         # 2. Navigate to the Prime Gaming home page
         driver.get(url)
         time.sleep(5)  # Allow the page to load
 
-        # 3. Scroll to load dynamic content
-        for scroll_index in range(3):
+        # 3. Dynamic Scrolling: Scroll until no new games load
+        scroll_pause_time = 3
+        max_scroll_attempts = 30
+        last_height = driver.execute_script("return document.body.scrollHeight")
+        scroll_attempts = 0
+
+        while scroll_attempts < max_scroll_attempts:
+            # Scroll down to bottom
             driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            time.sleep(3)
-            print(f"[DEBUG] Scrolled {scroll_index + 1} time(s).")
+            print(f"[DEBUG] Scrolled to bottom: Attempt {scroll_attempts + 1}")
+            # Wait to load page
+            time.sleep(scroll_pause_time)
+            # Calculate new scroll height and compare with last scroll height
+            new_height = driver.execute_script("return document.body.scrollHeight")
+            if new_height == last_height:
+                # If heights are the same, assume no more content
+                print("[DEBUG] Reached end of page.")
+                break
+            last_height = new_height
+            scroll_attempts += 1
 
         # 4. Wait for game cards to load
         WebDriverWait(driver, 20).until(
@@ -72,22 +91,45 @@ def scrape_prime():
                 # (B) If found, extract the game title
                 title_elem = card.find_element(By.CSS_SELECTOR, "h3.tw-amazon-ember-bold")
                 game_title = title_elem.get_attribute("title").strip()
-                
-                # (C) Attempt to find a direct link (if available)
-                # Note: Since there's no direct <a> tag, we'll use the main Prime Gaming URL
-                # Alternatively, you can simulate a click to capture dynamic URLs
-                game_link = url  # Placeholder link
-                
-                # (D) Append to the freebies list
+
+                # Avoid duplicates
+                if game_title in seen_titles:
+                    print(f"[DEBUG] Duplicate found: {game_title}. Skipping.")
+                    continue
+                seen_titles.add(game_title)
+
+                # (C) Extract the game link
+                # Primary attempt: Find a parent <a> tag
+                try:
+                    parent_a = card.find_element(By.XPATH, ".//ancestor::a[@href]")
+                    game_link = parent_a.get_attribute("href")
+                    if not game_link.startswith("http"):
+                        game_link = "https://gaming.amazon.com" + game_link
+                except NoSuchElementException:
+                    # Secondary attempt: Find any nested <a> tag
+                    try:
+                        nested_a = card.find_element(By.CSS_SELECTOR, "a[href]")
+                        game_link = nested_a.get_attribute("href")
+                        if not game_link.startswith("http"):
+                            game_link = "https://gaming.amazon.com" + game_link
+                    except NoSuchElementException:
+                        # Fallback: Use the main Prime Gaming URL
+                        game_link = url
+                        print(f"[DEBUG] No specific link found for '{game_title}'. Using home URL as fallback.")
+
                 prime_freebies.append({
                     "title": game_title,
-                    "link": game_link  # Modify if a specific link can be extracted
+                    "link": game_link
                 })
 
                 print(f"[DEBUG] #{index} FREEBIE: {game_title} | Link: {game_link}")
 
             except NoSuchElementException:
                 # If "Claim" button not found, it's not a free game
+                continue
+            except StaleElementReferenceException:
+                # Handle cases where the DOM has changed during scraping
+                print(f"[DEBUG] StaleElementReferenceException for card #{index}. Skipping.")
                 continue
             except Exception as e:
                 print(f"[DEBUG] Error parsing game card #{index}: {e}")
