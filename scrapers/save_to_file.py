@@ -14,7 +14,12 @@ def save_to_file(games_by_platform):
         f.write('    <link rel="stylesheet" type="text/css" href="styles/style.css">\n')
         f.write('</head>\n<body>\n')
 
-        f.write('    <h1>Free Today - Free Games</h1>\n')
+        # Logo and title
+        f.write('    <div class="title-container">\n')
+        f.write('        <img src="styles/logo.png" alt="Logo" class="logo">\n')
+        f.write('        <h1>Free Today - Free Games</h1>\n')
+        f.write('    </div>\n')
+
         f.write('    <p>Select a platform to see available free games:</p>\n')
         f.write('    <ul>\n')
 
@@ -39,7 +44,12 @@ def save_to_file(games_by_platform):
             f.write('    <link rel="stylesheet" type="text/css" href="../styles/style.css">\n')
             f.write('</head>\n<body>\n')
 
-            f.write(f'    <h1>{platform} - Free Games</h1>\n')
+            # Logo and title
+            f.write('    <div class="title-container">\n')
+            f.write('        <img src="../styles/logo.png" alt="Logo" class="logo">\n')
+            f.write(f'        <h1>{platform} - Free Games</h1>\n')
+            f.write('    </div>\n')
+
             f.write('    <ul>\n')
 
             if games:
