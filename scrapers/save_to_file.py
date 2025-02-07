@@ -1,41 +1,87 @@
-import os
-import shutil
+def save_to_file(games_by_platform):
+    with open('index.html', 'a', encoding='utf-8') as f:  # Append mode to add data to index.html
+        f.write('    <div class="platform-container">\n')
 
-# Define folders
-scraper_output_folder = "scrapers/"
-public_folder = "game_pages/"
+        # Write Steam games
+        f.write('        <div class="platform-column">\n')
+        f.write('            <h2>Steam</h2>\n')
+        f.write('            <div class="game-list">\n')
+        if games_by_platform["Steam"]:
+            for game in games_by_platform["Steam"]:
+                title, link = game  # Steam scraper uses tuple format
+                f.write(f'            <div class="game-item">\n')
+                f.write(f'                <a href="{link}">{title}</a><br>\n')
+                f.write('            </div>\n')
+        else:
+            f.write('            <p>No free games available today.</p>\n')
+        f.write('            </div>\n')  # End of Steam game list
+        f.write('        </div>\n')  # End of Steam column
 
-# Ensure the folders exist
-os.makedirs(scraper_output_folder, exist_ok=True)
-os.makedirs(public_folder, exist_ok=True)
+        # Write GOG games
+        f.write('        <div class="platform-column">\n')
+        f.write('            <h2>GOG</h2>\n')
+        f.write('            <div class="game-list">\n')
+        if games_by_platform["GOG"]:
+            for game in games_by_platform["GOG"]:
+                title = game['title']
+                link = game['link']
+                f.write(f'            <div class="game-item">\n')
+                f.write(f'                <a href="{link}">{title}</a><br>\n')
+                f.write('            </div>\n')
+        else:
+            f.write('            <p>No free games available today.</p>\n')
+        f.write('            </div>\n')  # End of GOG game list
+        f.write('        </div>\n')  # End of GOG column
 
-def save_to_file(filename, content):
-    """
-    Saves scraped game data to 'scrapers/' and copies it to 'game_pages/' for GitHub Pages.
-    Ensures both filename and content are valid before saving.
-    """
-    if not filename or not content:
-        print(f"⚠️ Error: Missing filename or content. Filename: {filename}, Content Length: {len(content) if content else 0}")
-        return
+        # Write Epic games
+        f.write('        <div class="platform-column">\n')
+        f.write('            <h2>Epic Games</h2>\n')
+        f.write('            <div class="game-list">\n')
+        if games_by_platform["Epic"]:
+            for game in games_by_platform["Epic"]:
+                title = game['title']
+                link = game['link']
+                f.write(f'            <div class="game-item">\n')
+                f.write(f'                <a href="{link}">{title}</a><br>\n')
+                f.write('            </div>\n')
+        else:
+            f.write('            <p>No free games available today.</p>\n')
+        f.write('            </div>\n')  # End of Epic game list
+        f.write('        </div>\n')  # End of Epic column
 
-    try:
-        # Save file in scrapers/
-        scraper_filepath = os.path.join(scraper_output_folder, filename)
-        with open(scraper_filepath, "w", encoding="utf-8") as f:
-            f.write(content)
+        # Write Google Play games
+        f.write('        <div class="platform-column">\n')
+        f.write('            <h2>Google Play Store</h2>\n')
+        f.write('            <div class="game-list">\n')
+        if games_by_platform["Google Play"]:
+            for game in games_by_platform["Google Play"]:
+                title = game['title']
+                link = game['link']
+                f.write(f'            <div class="game-item">\n')
+                f.write(f'                <a href="{link}">{title}</a><br>\n')
+                f.write('            </div>\n')
+        else:
+            f.write('            <p>No free games available today.</p>\n')
+        f.write('            </div>\n')  # End of Google Play game list
+        f.write('        </div>\n')  # End of Google Play column
 
-        # Copy file to game_pages/
-        public_filepath = os.path.join(public_folder, filename)
-        shutil.copy(scraper_filepath, public_filepath)
+        # ================================
+        # New: Prime Gaming Column
+        # ================================
+        f.write('        <div class="platform-column">\n')
+        f.write('            <h2>Prime Gaming</h2>\n')
+        f.write('            <div class="game-list">\n')
+        if games_by_platform["Prime Gaming"]:  # Must match your dictionary key
+            for game in games_by_platform["Prime Gaming"]:
+                # Assuming each game is a dict with 'title' and 'link'
+                title = game['title']
+                link = game['link']
+                f.write(f'            <div class="game-item">\n')
+                f.write(f'                <a href="{link}">{title}</a><br>\n')
+                f.write('            </div>\n')
+        else:
+            f.write('            <p>No free games available today.</p>\n')
+        f.write('            </div>\n')  # End of Prime Gaming game list
+        f.write('        </div>\n')  # End of Prime Gaming column
 
-        print(f"✅ Successfully saved and copied: {filename}")
-
-    except Exception as e:
-        print(f"❌ Error saving file {filename}: {e}")
-
-# Example usage
-if __name__ == "__main__":
-    # Test the function with dummy data
-    test_filename = "test.html"
-    test_content = "<html><body><h1>Test Page</h1></body></html>"
-    save_to_file(test_filename, test_content)
+        f.write('    </div>\n')  # End of platform-container
