@@ -19,12 +19,12 @@ def save_to_file(games_by_platform):
             f.write(f'    <h1>{platform} Free Games</h1>\n')
             f.write('    <div class="game-list">\n')
 
-            # Fix: Handle both tuples (Steam) and dictionaries (Other platforms)
+            # ✅ Fix: Handle Steam tuples & other platforms' dictionaries
             if games_by_platform[platform]:
                 for game in games_by_platform[platform]:
-                    if isinstance(game, tuple):  # Steam uses tuples
+                    if isinstance(game, tuple):  # Steam uses (title, link)
                         title, link = game
-                    elif isinstance(game, dict):  # Others use dicts
+                    elif isinstance(game, dict):  # Other platforms use {'title': ..., 'link': ...}
                         title = game.get('title', 'Unknown Game')
                         link = game.get('link', '#')
                     else:
