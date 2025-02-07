@@ -7,40 +7,40 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
+    <!-- Background Animation -->
+    <div class="background-animation">
+        <img src="assets/controller.svg" class="floating-icon" style="top: 10%; left: 15%;" />
+        <img src="assets/keyboard.svg" class="floating-icon" style="top: 30%; left: 60%;" />
+        <img src="assets/mouse.svg" class="floating-icon" style="top: 50%; left: 20%;" />
+        <img src="assets/cd.svg" class="floating-icon" style="top: 70%; left: 75%;" />
+        <img src="assets/cartridge.svg" class="floating-icon" style="top: 85%; left: 40%;" />
+    </div>
+
+    <!-- Header Navigation -->
     <header class="header">
         <a href="index.html">
-            <img src="styles/logo.png" class="logo" alt="Free Today Logo">
+            <img src="styles/logo.png" class="logo" alt="Free Today">
         </a>
     </header>
 
-    <div class="background-animation">
-        <img src="assets/controller.svg" class="floating-icon" style="top: 10%; left: 15%;">
-        <img src="assets/keyboard.svg" class="floating-icon" style="top: 30%; left: 60%;">
-        <img src="assets/mouse.svg" class="floating-icon" style="top: 50%; left: 20%;">
-        <img src="assets/cd.svg" class="floating-icon" style="top: 70%; left: 75%;">
-        <img src="assets/cartridge.svg" class="floating-icon" style="top: 85%; left: 40%;">
-    </div>
-
+    <!-- Hero Section -->
     <div class="hero">
         <h1>Free Today</h1>
-        <div id="quote-container">
-            <p id="quote-text">Loading...</p>
-        </div>
+        <p id="quote-text">Loading...</p>
     </div>
 
+    <!-- Advertisement Banner -->
     <div class="ad-banner">Advertisement Space</div>
 
+    <!-- Platform List -->
     <div class="platform-container">
-        <div class="platform-card"><a href="game_pages/steam.html">Steam (1 games)</a></div>
-        <div class="platform-card"><a href="game_pages/gog.html">GOG (48 games)</a></div>
-        <div class="platform-card"><a href="game_pages/epic.html">Epic (2 games)</a></div>
-        <div class="platform-card"><a href="game_pages/google-play.html">Google Play (6 games)</a></div>
-        <div class="platform-card"><a href="game_pages/prime-gaming.html">Prime Gaming (25 games)</a></div>
+        <a href="game_pages/steam.html" class="platform-card">Steam (1 games)</a>
+        <a href="game_pages/gog.html" class="platform-card">GOG (48 games)</a>
+        <a href="game_pages/epic.html" class="platform-card">Epic (2 games)</a>
+        <a href="game_pages/googleplay.html" class="platform-card">Google Play (6 games)</a>
+        <a href="game_pages/prime.html" class="platform-card">Prime Gaming (25 games)</a>
     </div>
-
-    <footer>
-        <p>&copy; 2025 Free Today. All rights reserved.</p>
-    </footer>
 
     <script src="scripts.js"></script>
 </body>
