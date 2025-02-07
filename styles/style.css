@@ -1,128 +1,69 @@
-/* General Page Styling */
-body {
-    background-color: #121212;
-    color: #ffffff;
-    font-family: 'Poppins', sans-serif;
-    margin: 0;
-    padding: 0;
-    text-align: center;
-}
+import os
 
-/* Header and Logo Section */
-.title-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #1f2937, #3b82f6);
-    padding: 40px;
-    border-bottom: 4px solid #2563eb;
-}
+def save_to_file(games_by_platform):
+    os.makedirs('game_pages', exist_ok=True)
 
-.logo {
-    width: 100px;
-    height: auto;
-    margin-bottom: 10px;
-}
+    # Main Index Page
+    with open('index.html', 'w', encoding='utf-8') as f:
+        f.write('<!DOCTYPE html>\n')
+        f.write('<html lang="en">\n<head>\n')
+        f.write('    <meta charset="UTF-8">\n')
+        f.write('    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n')
+        f.write('    <title>Free Today - Free Games</title>\n')
+        f.write('    <link rel="stylesheet" type="text/css" href="styles/style.css">\n')
+        f.write('</head>\n<body>\n')
 
-h1 {
-    font-size: 2.5em;
-    font-weight: 700;
-    color: #ffffff;
-    margin: 0;
-}
+        # Header with Logo
+        f.write('    <div class="title-container">\n')
+        f.write('        <img src="styles/logo.png" alt="Logo" class="logo">\n')
+        f.write('        <h1>Free Today - Free Games</h1>\n')
+        f.write('    </div>\n')
 
-/* Ad Banner Placement */
-.ad-banner {
-    background: #2d3748;
-    color: #ffffff;
-    width: 80%;
-    max-width: 728px;
-    margin: 20px auto;
-    padding: 15px;
-    border-radius: 5px;
-    text-align: center;
-    font-size: 1.2em;
-    font-weight: bold;
-    border: 2px dashed #00adb5;
-}
+        # Ad Banner
+        f.write('    <div class="ad-banner">Advertisement Space</div>\n')
 
-/* Main Page - Platform List */
-.platform-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-    padding: 40px;
-    justify-content: center;
-}
+        f.write('    <div class="platform-container">\n')
 
-/* Platform Cards */
-.platform-card {
-    background: #1e293b;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-    text-align: center;
-    transition: all 0.3s ease-in-out;
-    border: 2px solid #2563eb;
-}
+        # Generate links to platform pages
+        for platform, games in games_by_platform.items():
+            game_count = len(games)
+            page_name = f'game_pages/{platform.lower().replace(" ", "_")}.html'
+            f.write(f'        <div class="platform-card"><a href="{page_name}">{platform} ({game_count} games)</a></div>\n')
 
-.platform-card:hover {
-    background: #3b82f6;
-    color: #121212;
-    transform: translateY(-5px);
-}
+        f.write('    </div>\n')
+        f.write('</body>\n</html>\n')
 
-.platform-card a {
-    color: #ffffff;
-    text-decoration: none;
-    font-size: 1.2em;
-    font-weight: 600;
-}
+    # Generate Pages for Each Platform
+    for platform, games in games_by_platform.items():
+        page_name = f'game_pages/{platform.lower().replace(" ", "_")}.html'
+        with open(page_name, 'w', encoding='utf-8') as f:
+            f.write('<!DOCTYPE html>\n')
+            f.write('<html lang="en">\n<head>\n')
+            f.write(f'    <title>{platform} - Free Games</title>\n')
+            f.write('    <meta charset="UTF-8">\n')
+            f.write('    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n')
+            f.write('    <link rel="stylesheet" type="text/css" href="../styles/style.css">\n')
+            f.write('</head>\n<body>\n')
 
-.platform-card a:hover {
-    color: #121212;
-}
+            # Header with Logo
+            f.write('    <div class="title-container">\n')
+            f.write('        <img src="../styles/logo.png" alt="Logo" class="logo">\n')
+            f.write(f'        <h1>{platform} - Free Games</h1>\n')
+            f.write('    </div>\n')
 
-/* Game List Layout */
-.game-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 15px;
-    padding: 30px;
-}
+            # Ad Banner
+            f.write('    <div class="ad-banner">Advertisement Space</div>\n')
 
-/* Game Items */
-.game-item {
-    background: #222;
-    padding: 15px;
-    border-radius: 6px;
-    transition: all 0.2s ease-in-out;
-    border-left: 5px solid #00adb5;
-}
+            f.write('    <div class="game-container">\n')
 
-.game-item:hover {
-    background: #3b82f6;
-    transform: scale(1.05);
-}
+            if games:
+                for game in games:
+                    title = game['title'] if isinstance(game, dict) else game[0]
+                    link = game['link'] if isinstance(game, dict) else game[1]
+                    f.write(f'        <div class="game-item"><a href="{link}">{title}</a></div>\n')
+            else:
+                f.write('        <p>No free games available today.</p>\n')
 
-.game-item a {
-    color: #ffffff;
-    text-decoration: none;
-    font-size: 1.1em;
-    font-weight: 500;
-}
-
-.game-item a:hover {
-    color: #121212;
-}
-
-/* Footer */
-footer {
-    text-align: center;
-    padding: 20px;
-    font-size: 0.9em;
-    background: #101010;
-    color: #cccccc;
-    margin-top: 40px;
-}
+            f.write('    </div>\n')
+            f.write('<p><a href="../index.html">Back to main page</a></p>\n')
+            f.write('</body>\n</html>\n')
