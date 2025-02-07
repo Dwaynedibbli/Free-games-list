@@ -1,3 +1,5 @@
+# .github/workflows/hourly_scrape.yml
+
 name: Hourly Scrape
 
 on:
@@ -39,7 +41,9 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
+        git config --global user.name 'dwaynedibbli'
+        git config --global user.email 'geoffknight83@gmail.com'
         git add index.html game_pages/
-        git commit -m "Updated free games list and pages" || echo "No changes to commit"
+        git commit -m "Hourly update of free games list" || echo "No changes to commit"
         git pull origin main --rebase
         git push origin main
