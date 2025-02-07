@@ -1,87 +1,33 @@
 def save_to_file(games_by_platform):
-    with open('index.html', 'a', encoding='utf-8') as f:  # Append mode to add data to index.html
-        f.write('    <div class="platform-container">\n')
+    # Generate a summary index page
+    with open("index.html", "w", encoding="utf-8") as index_file:
+        index_file.write("<!DOCTYPE html>\n<html lang='en'>\n<head>\n")
+        index_file.write("<meta charset='UTF-8'>\n<meta name='viewport' content='width=device-width, initial-scale=1.0'>\n")
+        index_file.write("<title>Free Today</title>\n<link rel='stylesheet' type='text/css' href='styles/style.css'>\n")
+        index_file.write("</head>\n<body>\n")
+        index_file.write("<div class='title-container'>\n<h1>Free Today</h1>\n</div>\n")
+        index_file.write("<div class='platform-container'>\n")
 
-        # Write Steam games
-        f.write('        <div class="platform-column">\n')
-        f.write('            <h2>Steam</h2>\n')
-        f.write('            <div class="game-list">\n')
-        if games_by_platform["Steam"]:
-            for game in games_by_platform["Steam"]:
-                title, link = game  # Steam scraper uses tuple format
-                f.write(f'            <div class="game-item">\n')
-                f.write(f'                <a href="{link}">{title}</a><br>\n')
-                f.write('            </div>\n')
-        else:
-            f.write('            <p>No free games available today.</p>\n')
-        f.write('            </div>\n')  # End of Steam game list
-        f.write('        </div>\n')  # End of Steam column
+        for platform, games in games_by_platform.items():
+            platform_filename = f"{platform.lower().replace(' ', '_')}.html"
 
-        # Write GOG games
-        f.write('        <div class="platform-column">\n')
-        f.write('            <h2>GOG</h2>\n')
-        f.write('            <div class="game-list">\n')
-        if games_by_platform["GOG"]:
-            for game in games_by_platform["GOG"]:
-                title = game['title']
-                link = game['link']
-                f.write(f'            <div class="game-item">\n')
-                f.write(f'                <a href="{link}">{title}</a><br>\n')
-                f.write('            </div>\n')
-        else:
-            f.write('            <p>No free games available today.</p>\n')
-        f.write('            </div>\n')  # End of GOG game list
-        f.write('        </div>\n')  # End of GOG column
+            index_file.write(f"<div class='platform-column'>\n<h2><a href='{platform_filename}'>{platform} ({len(games)} free games)</a></h2>\n</div>\n")
 
-        # Write Epic games
-        f.write('        <div class="platform-column">\n')
-        f.write('            <h2>Epic Games</h2>\n')
-        f.write('            <div class="game-list">\n')
-        if games_by_platform["Epic"]:
-            for game in games_by_platform["Epic"]:
-                title = game['title']
-                link = game['link']
-                f.write(f'            <div class="game-item">\n')
-                f.write(f'                <a href="{link}">{title}</a><br>\n')
-                f.write('            </div>\n')
-        else:
-            f.write('            <p>No free games available today.</p>\n')
-        f.write('            </div>\n')  # End of Epic game list
-        f.write('        </div>\n')  # End of Epic column
+            # Generate platform-specific pages
+            with open(platform_filename, "w", encoding="utf-8") as platform_file:
+                platform_file.write(f"<!DOCTYPE html>\n<html lang='en'>\n<head>\n")
+                platform_file.write(f"<meta charset='UTF-8'>\n<meta name='viewport' content='width=device-width, initial-scale=1.0'>\n")
+                platform_file.write(f"<title>{platform} Free Games</title>\n<link rel='stylesheet' type='text/css' href='styles/style.css'>\n")
+                platform_file.write("</head>\n<body>\n")
+                platform_file.write(f"<h1>{platform} Free Games</h1>\n")
+                platform_file.write(f"<a href='index.html'>← Back to Main Page</a>\n")
+                platform_file.write("<ul>\n")
 
-        # Write Google Play games
-        f.write('        <div class="platform-column">\n')
-        f.write('            <h2>Google Play Store</h2>\n')
-        f.write('            <div class="game-list">\n')
-        if games_by_platform["Google Play"]:
-            for game in games_by_platform["Google Play"]:
-                title = game['title']
-                link = game['link']
-                f.write(f'            <div class="game-item">\n')
-                f.write(f'                <a href="{link}">{title}</a><br>\n')
-                f.write('            </div>\n')
-        else:
-            f.write('            <p>No free games available today.</p>\n')
-        f.write('            </div>\n')  # End of Google Play game list
-        f.write('        </div>\n')  # End of Google Play column
+                for game in games:
+                    title = game["title"]
+                    link = game["link"]
+                    platform_file.write(f"<li><a href='{link}' class='game-link'>{title}</a></li>\n")
 
-        # ================================
-        # New: Prime Gaming Column
-        # ================================
-        f.write('        <div class="platform-column">\n')
-        f.write('            <h2>Prime Gaming</h2>\n')
-        f.write('            <div class="game-list">\n')
-        if games_by_platform["Prime Gaming"]:  # Must match your dictionary key
-            for game in games_by_platform["Prime Gaming"]:
-                # Assuming each game is a dict with 'title' and 'link'
-                title = game['title']
-                link = game['link']
-                f.write(f'            <div class="game-item">\n')
-                f.write(f'                <a href="{link}">{title}</a><br>\n')
-                f.write('            </div>\n')
-        else:
-            f.write('            <p>No free games available today.</p>\n')
-        f.write('            </div>\n')  # End of Prime Gaming game list
-        f.write('        </div>\n')  # End of Prime Gaming column
+                platform_file.write("</ul>\n</body>\n</html>")
 
-        f.write('    </div>\n')  # End of platform-container
+        index_file.write("</div>\n</body>\n</html>")
