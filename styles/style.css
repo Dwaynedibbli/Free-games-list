@@ -1,83 +1,108 @@
-/* General Page Style */
+/* General Page Styling */
 body {
-    background-color: #1e1e1e; /* Dark background for a sleek look */
-    color: #ffffff; /* White text for contrast */
-    font-family: 'Inter', sans-serif;
+    background-color: #121212;
+    color: #ffffff;
+    font-family: 'Poppins', sans-serif;
     margin: 0;
     padding: 0;
     text-align: center;
 }
 
-/* Header and Title Styling */
+/* Header and Logo Section */
 .title-container {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #222831, #393e46);
-    padding: 20px;
-    border-bottom: 3px solid #00adb5;
+    background: linear-gradient(135deg, #1f2937, #3b82f6);
+    padding: 40px;
+    border-bottom: 4px solid #2563eb;
 }
 
 .logo {
-    width: 80px;
+    width: 100px;
     height: auto;
-    margin-right: 15px;
+    margin-bottom: 10px;
 }
 
 h1 {
     font-size: 2.5em;
     font-weight: 700;
+    color: #ffffff;
     margin: 0;
-    color: #00adb5;
 }
 
-/* Platform List Layout */
+/* Ad Banner Placement */
+.ad-banner {
+    background: #2d3748;
+    color: #ffffff;
+    width: 80%;
+    max-width: 728px;
+    margin: 20px auto;
+    padding: 15px;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 1.2em;
+    font-weight: bold;
+    border: 2px dashed #00adb5;
+}
+
+/* Main Page - Platform List */
 .platform-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px;
     padding: 40px;
     justify-content: center;
 }
 
-/* Individual Platform Cards */
-.platform-column {
-    background: #292929;
+/* Platform Cards */
+.platform-card {
+    background: #1e293b;
     padding: 20px;
-    border-radius: 10px;
+    border-radius: 8px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-    text-align: left;
+    text-align: center;
     transition: all 0.3s ease-in-out;
+    border: 2px solid #2563eb;
 }
 
-.platform-column:hover {
+.platform-card:hover {
+    background: #3b82f6;
+    color: #121212;
     transform: translateY(-5px);
 }
 
-/* Platform Titles */
-h2 {
-    font-size: 1.8em;
-    color: #00adb5;
-    margin-bottom: 15px;
+.platform-card a {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 1.2em;
+    font-weight: 600;
 }
 
-/* Game List Styling */
-.game-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+.platform-card a:hover {
+    color: #121212;
 }
 
+/* Game List Layout */
+.game-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 15px;
+    padding: 30px;
+}
+
+/* Game Items */
 .game-item {
-    background: #333;
-    padding: 10px;
-    margin-bottom: 8px;
-    border-radius: 5px;
+    background: #222;
+    padding: 15px;
+    border-radius: 6px;
     transition: all 0.2s ease-in-out;
+    border-left: 5px solid #00adb5;
 }
 
 .game-item:hover {
-    background: #00adb5;
+    background: #3b82f6;
     transform: scale(1.05);
 }
 
@@ -89,10 +114,10 @@ h2 {
 }
 
 .game-item a:hover {
-    color: #222831;
+    color: #121212;
 }
 
-/* Footer Styling */
+/* Footer */
 footer {
     text-align: center;
     padding: 20px;
