@@ -13,8 +13,30 @@ html, body {
     line-height: 1.7;
     margin: 0;
     padding: 0;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+}
+
+/* 🔹 BACKGROUND ANIMATION */
+.background-animation {
+    position: fixed;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.floating-icon {
+    position: absolute;
+    width: 80px;
+    opacity: 0.2;
+    animation: float-animation 14s ease-in-out infinite alternate;
+}
+
+/* 🔹 ICON MOVEMENT TOWARD CENTER */
+@keyframes float-animation {
+    0% { transform: translateY(-30px) rotate(0deg); opacity: 0.3; }
+    50% { transform: translateY(30px) rotate(15deg); opacity: 0.5; }
+    100% { transform: translateY(-30px) rotate(0deg); opacity: 0.3; }
 }
 
 /* 🔹 HEADER */
@@ -22,37 +44,27 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #0f0f0f;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: rgba(10, 10, 10, 0.85);
     padding: 20px 50px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    transition: background 0.3s ease-in-out;
 }
 
 .logo {
     width: 40px;
     height: auto;
-}
-
-.nav {
-    display: flex;
-    gap: 25px;
-}
-
-.nav a {
-    color: #ffffff;
-    text-decoration: none;
-    font-size: 1.1em;
-    font-weight: 500;
-    transition: color 0.3s ease-in-out;
-}
-
-.nav a:hover {
-    color: #4a90e2;
+    cursor: pointer;
 }
 
 /* 🔹 HERO SECTION */
 .hero {
     text-align: center;
-    padding: 80px 20px;
+    padding: 150px 20px 50px;
     font-size: 3em;
     font-weight: 700;
     color: #ffffff;
@@ -60,7 +72,7 @@ html, body {
 
 /* 🔹 AD BANNER */
 .ad-banner {
-    background: #181818;
+    background: rgba(30, 30, 30, 0.85);
     color: #ffffff;
     width: 90%;
     max-width: 728px;
@@ -86,33 +98,20 @@ html, body {
 
 /* 🔹 PLATFORM CARDS */
 .platform-card {
-    background: #1a1a1a;
+    background: rgba(20, 20, 20, 0.6);
     padding: 25px;
     border-radius: 14px;
     text-align: center;
     transition: all 0.3s ease-in-out;
     box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
 }
 
 .platform-card:hover {
-    background: #4a90e2;
-    color: #121212;
+    background: rgba(74, 144, 226, 0.9);
     transform: translateY(-4px);
     border: 1px solid #ffffff;
-}
-
-.platform-card a {
-    display: block;
-    color: #ffffff;
-    text-decoration: none;
-    font-size: 1.3em;
-    font-weight: bold;
-    padding: 12px;
-}
-
-.platform-card a:hover {
-    color: #121212;
 }
 
 /* 🔹 GAME LIST */
@@ -127,17 +126,17 @@ html, body {
 
 /* 🔹 GAME CARDS */
 .game-item {
-    background: #222222;
+    background: rgba(25, 25, 25, 0.8);
     padding: 20px;
     border-radius: 12px;
     text-align: center;
     transition: all 0.3s ease-in-out;
     border-left: 5px solid #4a90e2;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(5px);
 }
 
 .game-item:hover {
-    background: #4a90e2;
+    background: rgba(74, 144, 226, 0.9);
     transform: scale(1.05);
 }
 
@@ -151,21 +150,12 @@ html, body {
     transition: all 0.2s ease-in-out;
 }
 
-/* 🔹 FIX FOR CLICKED LINKS */
-.game-item a:visited {
-    color: #9bb2d1; /* Subtle color change for visited links */
-}
-
-.game-item a:hover {
-    color: #121212;
-}
-
 /* 🔹 FOOTER */
 footer {
     text-align: center;
     padding: 30px;
     font-size: 0.9em;
-    background: #0f0f0f;
+    background: rgba(10, 10, 10, 0.9);
     color: #cccccc;
     margin-top: 50px;
 }
