@@ -16,47 +16,24 @@ html, body {
     overflow-x: hidden;
 }
 
-/* 🔹 BACKGROUND ANIMATION */
-.background-animation {
-    position: fixed;
-    width: 100%;
-    height: 100vh;
-    overflow: hidden;
-    z-index: -1;
-}
-
-.floating-icon {
-    position: absolute;
-    width: 100px;
-    opacity: 0.2;
-    animation: float-animation 14s ease-in-out infinite alternate;
-}
-
-@keyframes float-animation {
-    0% { transform: translateY(-30px) rotate(0deg); opacity: 0.3; }
-    50% { transform: translateY(30px) rotate(15deg); opacity: 0.5; }
-    100% { transform: translateY(-30px) rotate(0deg); opacity: 0.3; }
-}
-
 /* 🔹 HEADER NAVIGATION */
 .header {
     position: fixed;
     top: 0;
+    left: 0;
     width: 100%;
     display: flex;
     align-items: center;
-    justify-content: center;
     padding: 20px;
     background: rgba(10, 10, 10, 0.85);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
     z-index: 1000;
-    transition: background 0.3s ease-in-out;
 }
 
 .logo {
-    width: 50px;
+    width: 60px;
     height: auto;
+    margin-left: 20px;
     cursor: pointer;
     transition: transform 0.3s ease-in-out;
 }
@@ -67,12 +44,13 @@ html, body {
 
 /* 🔹 HERO SECTION */
 .hero {
-    height: 100vh;
+    height: 50vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
+    padding-top: 100px;
 }
 
 .hero h1 {
@@ -101,7 +79,6 @@ html, body {
     font-size: 1.4em;
     font-weight: bold;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.4);
 }
 
 /* 🔹 PLATFORM CARDS */
@@ -120,9 +97,6 @@ html, body {
     border-radius: 16px;
     text-align: center;
     transition: all 0.3s ease-in-out;
-    box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
     text-decoration: none;
     color: #ffffff;
     font-size: 1.3em;
@@ -132,5 +106,4 @@ html, body {
 .platform-card:hover {
     background: rgba(74, 144, 226, 0.9);
     transform: translateY(-5px);
-    border: 1px solid #ffffff;
 }
