@@ -30,15 +30,13 @@ let quoteIndex = 0;
 
 function changeQuote() {
     const quoteElement = document.getElementById("quote-text");
-    quoteElement.style.opacity = 0; // Fade out
+    quoteElement.style.opacity = 0;
     setTimeout(() => {
         quoteElement.textContent = quotes[quoteIndex];
-        quoteElement.style.opacity = 1; // Fade in
+        quoteElement.style.opacity = 1;
         quoteIndex = (quoteIndex + 1) % quotes.length;
     }, 500);
 }
 
-setInterval(changeQuote, 5000); // Change quote every 5 seconds
-
-// Initialize first quote when page loads
+setInterval(changeQuote, 5000);
 document.addEventListener("DOMContentLoaded", changeQuote);
