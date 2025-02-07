@@ -1,109 +1,94 @@
-/* 🔹 RESET & GLOBAL STYLES */
-* {
-    box-sizing: border-box;
+/* General page style */
+body {
+    background-color: #2e2e2e; /* Lighter gray background */
+    color: #f0f0f0; /* Light text for readability */
+    font-family: 'Roboto', sans-serif;
     margin: 0;
     padding: 0;
-    font-family: 'Inter', sans-serif;
 }
 
-html, body {
-    background-color: #0a0a0a;
-    color: #e0e0e0;
-    font-size: 18px;
-    line-height: 1.8;
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
+/* Two-column layout */
+.platform-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Two columns */
+    gap: 20px;
+    padding: 20px;
 }
 
-/* 🔹 HEADER NAVIGATION */
-.header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
+/* Individual platform column */
+.platform-column {
+    background-color: #3a3a3a; /* Slightly darker gray for cards */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+}
+
+/* Banner ad section */
+.banner-ad {
+    height: 150px; /* Fixed height for the ad */
+    background-color: #444; /* Placeholder darker gray */
+    margin-bottom: 10px;
+    text-align: center;
+    color: #f0f0f0;
+    line-height: 150px; /* Vertically center content */
+}
+
+/* Page title and logo */
+.title-container {
     display: flex;
     align-items: center;
-    padding: 20px;
-    background: rgba(10, 10, 10, 0.85);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    z-index: 1000;
+    justify-content: center;
+    margin-bottom: 20px;
 }
 
 .logo {
-    width: 60px;
+    width: 100px; /* Adjust the size of the logo as needed */
     height: auto;
-    margin-left: 20px;
-    cursor: pointer;
-    transition: transform 0.3s ease-in-out;
+    margin-right: 20px; /* Adds space between the logo and the title */
 }
 
-.logo:hover {
-    transform: scale(1.1);
+h1, h2 {
+    font-size: 3em; /* Increased size for title */
+    color: #f0f0f0;
+    margin-bottom: 10px;
 }
 
-/* 🔹 HERO SECTION */
-.hero {
-    height: 50vh;
+/* Game list layout */
+.game-list {
     display: flex;
     flex-direction: column;
+}
+
+/* Game item */
+.game-item {
+    display: flex;
     align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding-top: 100px;
+    margin-bottom: 10px;
 }
 
-.hero h1 {
-    font-size: 3.5em;
-    font-weight: 800;
-    letter-spacing: 2px;
-    color: #ffffff;
+.game-item img {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+    border-radius: 5px;
 }
 
-.hero p {
-    font-size: 1.5em;
-    font-weight: 400;
-    color: rgba(255, 255, 255, 0.6);
-}
-
-/* 🔹 AD BANNER */
-.ad-banner {
-    background: rgba(30, 30, 30, 0.9);
-    color: #ffffff;
-    width: 90%;
-    max-width: 728px;
-    margin: 50px auto;
-    padding: 20px;
-    border-radius: 14px;
-    text-align: center;
-    font-size: 1.4em;
-    font-weight: bold;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-/* 🔹 PLATFORM CARDS */
-.platform-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 30px;
-    padding: 80px;
-    max-width: 1100px;
-    margin: 0 auto;
-}
-
-.platform-card {
-    background: rgba(20, 20, 20, 0.6);
-    padding: 30px;
-    border-radius: 16px;
-    text-align: center;
-    transition: all 0.3s ease-in-out;
+.game-item a {
+    color: #4a90e2; /* Link color */
     text-decoration: none;
-    color: #ffffff;
-    font-size: 1.3em;
-    font-weight: 600;
+    font-size: 1.1em;
 }
 
-.platform-card:hover {
-    background: rgba(74, 144, 226, 0.9);
-    transform: translateY(-5px);
+.game-item a:hover {
+    color: #f5a623; /* Hover effect for links */
+}
+
+/* Footer styling for the disclaimer */
+footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 0.9em;
+    color: #e0e0e0;
+    background-color: #101010; /* Dark footer background */
+    margin-top: 50px;
 }
