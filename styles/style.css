@@ -1,45 +1,48 @@
-/* Reset & Global Styles */
+/* 🔹 RESET & GLOBAL STYLES */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    font-family: 'Inter', sans-serif;
 }
 
+/* 🔹 BODY & BACKGROUND */
 body {
     background-color: #121212;
     color: #ffffff;
-    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
     margin: 0;
     padding: 0;
+    text-align: center;
 }
 
-/* Header Section */
+/* 🔹 HEADER SECTION */
 .title-container {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    background: linear-gradient(135deg, #24292e, #1e40af);
+    background: linear-gradient(135deg, #23272a, #2a4365);
     padding: 20px;
     border-bottom: 4px solid #00adb5;
     max-width: 100%;
 }
 
-/* Logo Positioned to the Left */
+/* 🔹 LOGO POSITIONING */
 .logo {
-    width: 60px;
+    width: 50px; /* Adjusted to stay balanced */
     height: auto;
     margin-right: 15px;
 }
 
-/* Title Styling */
+/* 🔹 MAIN TITLE */
 h1 {
-    font-size: 2.5em;
+    font-size: 2.3em;
     font-weight: 700;
     color: #ffffff;
-    margin: 0;
 }
 
-/* Ad Banner Placement */
+/* 🔹 AD BANNER */
 .ad-banner {
     background: #2d3748;
     color: #ffffff;
@@ -52,9 +55,10 @@ h1 {
     font-size: 1.2em;
     font-weight: bold;
     border: 2px dashed #00adb5;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
 }
 
-/* Main Page - Platform List */
+/* 🔹 PLATFORM LIST CONTAINER */
 .platform-container {
     display: flex;
     flex-wrap: wrap;
@@ -63,15 +67,15 @@ h1 {
     padding: 40px;
 }
 
-/* Platform Cards */
+/* 🔹 PLATFORM CARDS */
 .platform-card {
-    background: #20232a;
+    background: #222831;
     padding: 20px;
-    border-radius: 10px;
+    border-radius: 12px;
     width: 280px;
     text-align: center;
     transition: all 0.3s ease-in-out;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.4);
     border: 2px solid #3b82f6;
 }
 
@@ -94,7 +98,7 @@ h1 {
     color: #121212;
 }
 
-/* Game List Layout */
+/* 🔹 GAME LIST CONTAINER */
 .game-container {
     display: flex;
     flex-wrap: wrap;
@@ -103,15 +107,16 @@ h1 {
     padding: 30px;
 }
 
-/* Game Items */
+/* 🔹 GAME CARDS */
 .game-item {
-    background: #333;
+    background: #2a2d32;
     padding: 15px;
     border-radius: 8px;
     width: 280px;
     text-align: center;
     transition: all 0.2s ease-in-out;
     border-left: 5px solid #00adb5;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .game-item:hover {
@@ -132,7 +137,17 @@ h1 {
     color: #121212;
 }
 
-/* Responsive Design */
+/* 🔹 FOOTER */
+footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 0.9em;
+    background: #101010;
+    color: #cccccc;
+    margin-top: 40px;
+}
+
+/* 🔹 RESPONSIVE DESIGN */
 @media screen and (max-width: 768px) {
     .title-container {
         justify-content: center;
@@ -141,7 +156,7 @@ h1 {
     }
 
     .logo {
-        width: 50px;
+        width: 45px;
         margin-bottom: 10px;
     }
 
