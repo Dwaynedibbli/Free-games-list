@@ -1,40 +1,33 @@
-import json  # ✅ This was missing! Now fixed.
-
 def save_to_file(games_by_platform):
-    with open("index.html", "w", encoding="utf-8") as f:
-        f.write(f'<!DOCTYPE html>\n<html lang="en">\n<head>\n')
-        f.write('    <meta charset="UTF-8">\n')
-        f.write('    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n')
-        f.write('    <title>Free Games Today</title>\n')
-        f.write('    <link rel="stylesheet" href="style.css">\n')
-        f.write('    <script src="scripts.js" defer></script>\n')
-        f.write('</head>\n<body>\n')
+    # Generate a summary index page
+    with open("index.html", "w", encoding="utf-8") as index_file:
+        index_file.write("<!DOCTYPE html>\n<html lang='en'>\n<head>\n")
+        index_file.write("<meta charset='UTF-8'>\n<meta name='viewport' content='width=device-width, initial-scale=1.0'>\n")
+        index_file.write("<title>Free Today</title>\n<link rel='stylesheet' type='text/css' href='styles/style.css'>\n")
+        index_file.write("</head>\n<body>\n")
+        index_file.write("<div class='title-container'>\n<h1>Free Today</h1>\n</div>\n")
+        index_file.write("<div class='platform-container'>\n")
 
-        # ✅ Embed game data as JSON inside `index.html`
-        f.write(f'    <script id="game-data" type="application/json">\n')
-        f.write(json.dumps(games_by_platform, indent=4))  # ✅ Now works correctly
-        f.write('\n    </script>\n')
+        for platform, games in games_by_platform.items():
+            platform_filename = f"{platform.lower().replace(' ', '_')}.html"
 
-        f.write('    <div class="title-container">\n')
-        f.write('        <img src="logo.png" alt="Free Today Logo" class="logo">\n')
-        f.write('        <h1>Free Today</h1>\n')
-        f.write('    </div>\n')
+            index_file.write(f"<div class='platform-column'>\n<h2><a href='{platform_filename}'>{platform} ({len(games)} free games)</a></h2>\n</div>\n")
 
-        f.write('    <h2>Free Games Today</h2>\n')
-        f.write('    <div class="platform-container">\n')
-        for platform in games_by_platform.keys():
-            f.write(f'        <p><a href="#" onclick="showGames(\'{platform}\')">{platform} (<span id="{platform.lower()}-count">0</span> games)</a></p>\n')
-        f.write('    </div>\n')
+            # Generate platform-specific pages
+            with open(platform_filename, "w", encoding="utf-8") as platform_file:
+                platform_file.write(f"<!DOCTYPE html>\n<html lang='en'>\n<head>\n")
+                platform_file.write(f"<meta charset='UTF-8'>\n<meta name='viewport' content='width=device-width, initial-scale=1.0'>\n")
+                platform_file.write(f"<title>{platform} Free Games</title>\n<link rel='stylesheet' type='text/css' href='styles/style.css'>\n")
+                platform_file.write("</head>\n<body>\n")
+                platform_file.write(f"<h1>{platform} Free Games</h1>\n")
+                platform_file.write(f"<a href='index.html'>← Back to Main Page</a>\n")
+                platform_file.write("<ul>\n")
 
-        f.write('    <h2 id="platform-title">All Free Games</h2>\n')
-        f.write('    <div class="game-list" id="game-list">\n')
-        f.write('        <p>Select a platform to view available games.</p>\n')
-        f.write('    </div>\n')
+                for game in games:
+                    title = game["title"]
+                    link = game["link"]
+                    platform_file.write(f"<li><a href='{link}' class='game-link'>{title}</a></li>\n")
 
-        f.write('    <footer>\n')
-        f.write('        <p>Disclaimer: Free games are subject to availability. Check the respective platforms for up-to-date information.</p>\n')
-        f.write('    </footer>\n')
+                platform_file.write("</ul>\n</body>\n</html>")
 
-        f.write('</body>\n</html>\n')
-
-    print("✅ Game data saved inside index.html")
+        index_file.write("</div>\n</body>\n</html>")
