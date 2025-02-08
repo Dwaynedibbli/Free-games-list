@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Free Games Today</title>
     <link rel="stylesheet" href="style.css">
-    <script src="scripts.js"></script>
+    <script src="scripts.js" defer></script>
 </head>
 <body>
     <!-- Logo -->
@@ -17,11 +17,17 @@
     <!-- Free Games Summary -->
     <h2>Free Games Today</h2>
     <div class="platform-container">
-        <div class="platform-column"><h3><a href="steam.html">Steam</a> - X games</h3></div>
-        <div class="platform-column"><h3><a href="gog.html">GOG</a> - X games</h3></div>
-        <div class="platform-column"><h3><a href="epic.html">Epic Games</a> - X games</h3></div>
-        <div class="platform-column"><h3><a href="google_play.html">Google Play Store</a> - X games</h3></div>
-        <div class="platform-column"><h3><a href="prime_gaming.html">Prime Gaming</a> - X games</h3></div>
+        <p><a href="#" onclick="showGames('Steam')">Steam (<span id="steam-count">0</span> games)</a></p>
+        <p><a href="#" onclick="showGames('GOG')">GOG (<span id="gog-count">0</span> games)</a></p>
+        <p><a href="#" onclick="showGames('Epic')">Epic Games (<span id="epic-count">0</span> games)</a></p>
+        <p><a href="#" onclick="showGames('Google Play')">Google Play (<span id="google-count">0</span> games)</a></p>
+        <p><a href="#" onclick="showGames('Prime Gaming')">Prime Gaming (<span id="prime-count">0</span> games)</a></p>
+    </div>
+
+    <!-- Dynamic Game List -->
+    <h2 id="platform-title">All Free Games</h2>
+    <div class="game-list" id="game-list">
+        <p>Select a platform to view available games.</p>
     </div>
 
     <!-- Disclaimer -->
