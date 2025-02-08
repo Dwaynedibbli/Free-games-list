@@ -1,3 +1,5 @@
+import json  # ✅ This was missing! Now fixed.
+
 def save_to_file(games_by_platform):
     with open("index.html", "w", encoding="utf-8") as f:
         f.write(f'<!DOCTYPE html>\n<html lang="en">\n<head>\n')
@@ -8,9 +10,9 @@ def save_to_file(games_by_platform):
         f.write('    <script src="scripts.js" defer></script>\n')
         f.write('</head>\n<body>\n')
 
-        # ✅ Embed game data as a JSON object inside `index.html`
+        # ✅ Embed game data as JSON inside `index.html`
         f.write(f'    <script id="game-data" type="application/json">\n')
-        f.write(json.dumps(games_by_platform, indent=4))
+        f.write(json.dumps(games_by_platform, indent=4))  # ✅ Now works correctly
         f.write('\n    </script>\n')
 
         f.write('    <div class="title-container">\n')
