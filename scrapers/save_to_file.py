@@ -1,4 +1,10 @@
 def save_to_file(games_by_platform):
+    print("\n📢 DEBUG: Checking collected game data...\n")
+    for platform, games in games_by_platform.items():
+        print(f"🔹 {platform}: {len(games)} games found")
+        for game in games:
+            print(game)  # Print each game's data
+
     platform_files = {
         "Steam": "steam.html",
         "GOG": "gog.html",
@@ -16,19 +22,20 @@ def save_to_file(games_by_platform):
             f.write('    <link rel="stylesheet" href="style.css">\n')
             f.write('    <script src="scripts.js"></script>\n')
             f.write('</head>\n<body>\n')
+
             f.write(f'    <h1>{platform} Free Games</h1>\n')
             f.write('    <div class="game-list">\n')
 
-            # ✅ Fix: Handle Steam tuples & other platforms' dictionaries
             if games_by_platform[platform]:
                 for game in games_by_platform[platform]:
-                    if isinstance(game, tuple):  # Steam uses (title, link)
+                    if isinstance(game, tuple):  
                         title, link = game
-                    elif isinstance(game, dict):  # Other platforms use {'title': ..., 'link': ...}
+                    elif isinstance(game, dict):  
                         title = game.get('title', 'Unknown Game')
                         link = game.get('link', '#')
-                    else:
-                        continue  # Skip invalid data
+
+                    if not link.startswith("http"):
+                        link = f"https://{link}"
 
                     f.write(f'        <div class="game-item"><a href="{link}">{title}</a></div>\n')
             else:
@@ -38,4 +45,4 @@ def save_to_file(games_by_platform):
             f.write('    <footer><a href="index.html">Back to Home</a></footer>\n')
             f.write('</body>\n</html>\n')
 
-    print("Separate HTML pages dynamically generated.")
+    print("\n✅ DEBUG: Game data written successfully.\n")
