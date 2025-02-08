@@ -1,51 +1,155 @@
-body {
-    background-color: #2e2e2e;
-    color: #f0f0f0;
-    font-family: 'Roboto', sans-serif;
+/* Reset & Global Styles */
+* {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    text-align: center;
 }
 
-.platform-container {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
+body {
+    background-color: #121212;
+    color: #ffffff;
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Header Section */
+.title-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    background: linear-gradient(135deg, #24292e, #1e40af);
     padding: 20px;
+    border-bottom: 4px solid #00adb5;
+    max-width: 100%;
 }
 
-.platform-column {
-    background-color: #3a3a3a;
+/* Logo Positioned to the Left */
+.logo {
+    width: 60px;
+    height: auto;
+    margin-right: 15px;
+}
+
+/* Title Styling */
+h1 {
+    font-size: 2.5em;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+}
+
+/* Ad Banner Placement */
+.ad-banner {
+    background: #2d3748;
+    color: #ffffff;
+    width: 90%;
+    max-width: 728px;
+    margin: 20px auto;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 1.2em;
+    font-weight: bold;
+    border: 2px dashed #00adb5;
+}
+
+/* Main Page - Platform List */
+.platform-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    padding: 40px;
+}
+
+/* Platform Cards */
+.platform-card {
+    background: #20232a;
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 280px;
+    text-align: center;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    border: 2px solid #3b82f6;
 }
 
-h1, h2 {
-    font-size: 2em;
-    margin-bottom: 10px;
+.platform-card:hover {
+    background: #3b82f6;
+    color: #121212;
+    transform: scale(1.05);
 }
 
-.game-list {
+.platform-card a {
+    display: block;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 1.3em;
+    font-weight: bold;
+    padding: 10px;
+}
+
+.platform-card a:hover {
+    color: #121212;
+}
+
+/* Game List Layout */
+.game-container {
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    padding: 30px;
+}
+
+/* Game Items */
+.game-item {
+    background: #333;
+    padding: 15px;
+    border-radius: 8px;
+    width: 280px;
+    text-align: center;
+    transition: all 0.2s ease-in-out;
+    border-left: 5px solid #00adb5;
+}
+
+.game-item:hover {
+    background: #3b82f6;
+    transform: scale(1.05);
 }
 
 .game-item a {
-    color: #4a90e2;
+    color: #ffffff;
     text-decoration: none;
     font-size: 1.2em;
+    font-weight: 500;
+    display: block;
+    padding: 8px;
 }
 
 .game-item a:hover {
-    color: #f5a623;
+    color: #121212;
 }
 
-footer {
-    text-align: center;
-    padding: 20px;
-    font-size: 0.9em;
-    background-color: #101010;
-    margin-top: 50px;
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+    .title-container {
+        justify-content: center;
+        text-align: center;
+        flex-direction: column;
+    }
+
+    .logo {
+        width: 50px;
+        margin-bottom: 10px;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    .platform-card, .game-item {
+        width: 100%;
+    }
 }
