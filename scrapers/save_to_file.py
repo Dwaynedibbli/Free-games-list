@@ -1,48 +1,38 @@
 def save_to_file(games_by_platform):
-    print("\n📢 DEBUG: Checking collected game data...\n")
-    for platform, games in games_by_platform.items():
-        print(f"🔹 {platform}: {len(games)} games found")
-        for game in games:
-            print(game)  # Print each game's data
+    with open("index.html", "w", encoding="utf-8") as f:
+        f.write(f'<!DOCTYPE html>\n<html lang="en">\n<head>\n')
+        f.write('    <meta charset="UTF-8">\n')
+        f.write('    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n')
+        f.write('    <title>Free Games Today</title>\n')
+        f.write('    <link rel="stylesheet" href="style.css">\n')
+        f.write('    <script src="scripts.js" defer></script>\n')
+        f.write('</head>\n<body>\n')
 
-    platform_files = {
-        "Steam": "steam.html",
-        "GOG": "gog.html",
-        "Epic": "epic.html",
-        "Google Play": "google_play.html",
-        "Prime Gaming": "prime_gaming.html"
-    }
+        # ✅ Embed game data as a JSON object inside `index.html`
+        f.write(f'    <script id="game-data" type="application/json">\n')
+        f.write(json.dumps(games_by_platform, indent=4))
+        f.write('\n    </script>\n')
 
-    for platform, filename in platform_files.items():
-        with open(filename, 'w', encoding='utf-8') as f:
-            f.write(f'<!DOCTYPE html>\n<html lang="en">\n<head>\n')
-            f.write('    <meta charset="UTF-8">\n')
-            f.write('    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n')
-            f.write(f'    <title>{platform} Free Games</title>\n')
-            f.write('    <link rel="stylesheet" href="style.css">\n')
-            f.write('    <script src="scripts.js"></script>\n')
-            f.write('</head>\n<body>\n')
+        f.write('    <div class="title-container">\n')
+        f.write('        <img src="logo.png" alt="Free Today Logo" class="logo">\n')
+        f.write('        <h1>Free Today</h1>\n')
+        f.write('    </div>\n')
 
-            f.write(f'    <h1>{platform} Free Games</h1>\n')
-            f.write('    <div class="game-list">\n')
+        f.write('    <h2>Free Games Today</h2>\n')
+        f.write('    <div class="platform-container">\n')
+        for platform in games_by_platform.keys():
+            f.write(f'        <p><a href="#" onclick="showGames(\'{platform}\')">{platform} (<span id="{platform.lower()}-count">0</span> games)</a></p>\n')
+        f.write('    </div>\n')
 
-            if games_by_platform[platform]:
-                for game in games_by_platform[platform]:
-                    if isinstance(game, tuple):  
-                        title, link = game
-                    elif isinstance(game, dict):  
-                        title = game.get('title', 'Unknown Game')
-                        link = game.get('link', '#')
+        f.write('    <h2 id="platform-title">All Free Games</h2>\n')
+        f.write('    <div class="game-list" id="game-list">\n')
+        f.write('        <p>Select a platform to view available games.</p>\n')
+        f.write('    </div>\n')
 
-                    if not link.startswith("http"):
-                        link = f"https://{link}"
+        f.write('    <footer>\n')
+        f.write('        <p>Disclaimer: Free games are subject to availability. Check the respective platforms for up-to-date information.</p>\n')
+        f.write('    </footer>\n')
 
-                    f.write(f'        <div class="game-item"><a href="{link}">{title}</a></div>\n')
-            else:
-                f.write('        <p>No free games available today.</p>\n')
+        f.write('</body>\n</html>\n')
 
-            f.write('    </div>\n')
-            f.write('    <footer><a href="index.html">Back to Home</a></footer>\n')
-            f.write('</body>\n</html>\n')
-
-    print("\n✅ DEBUG: Game data written successfully.\n")
+    print("✅ Game data saved inside index.html")
