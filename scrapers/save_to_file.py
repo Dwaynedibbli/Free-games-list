@@ -13,23 +13,23 @@ def save_to_file(games_by_platform):
         f.write('    <link rel="stylesheet" type="text/css" href="styles/style.css">\n')
         f.write('</head>\n<body>\n')
 
-        # Header with Logo and Title
+        # Header with Logo and Title as a Link
         f.write('    <div class="title-container">\n')
-        f.write('        <img src="styles/logo.png" alt="Logo" class="logo">\n')
-        f.write('        <h1>Free Today - Free Games</h1>\n')
+        f.write('        <a href="index.html" style="text-decoration: none; color: inherit;">\n')
+        f.write('            <img src="styles/logo.png" alt="Logo" class="logo">\n')
+        f.write('            <h1>Free Today - Free Games</h1>\n')
+        f.write('        </a>\n')
         f.write('    </div>\n')
 
         # Ad Banner
         f.write('    <div class="ad-banner">Advertisement Space</div>\n')
 
+        # Platform links
         f.write('    <div class="platform-container">\n')
-
-        # Generate links to platform pages
         for platform, games in games_by_platform.items():
             game_count = len(games)
             page_name = f'game_pages/{platform.lower().replace(" ", "_")}.html'
             f.write(f'        <div class="platform-card"><a href="{page_name}">{platform} ({game_count} games)</a></div>\n')
-
         f.write('    </div>\n')
         f.write('</body>\n</html>\n')
 
@@ -45,17 +45,19 @@ def save_to_file(games_by_platform):
             f.write('    <link rel="stylesheet" type="text/css" href="../styles/style.css">\n')
             f.write('</head>\n<body>\n')
 
-            # Header with Logo and Title
+            # Header with Logo and Title as a Link
             f.write('    <div class="title-container">\n')
-            f.write('        <img src="../styles/logo.png" alt="Logo" class="logo">\n')
-            f.write(f'        <h1>{platform} - Free Games</h1>\n')
+            f.write('        <a href="../index.html" style="text-decoration: none; color: inherit;">\n')
+            f.write('            <img src="../styles/logo.png" alt="Logo" class="logo">\n')
+            f.write(f'            <h1>{platform} - Free Games</h1>\n')
+            f.write('        </a>\n')
             f.write('    </div>\n')
 
             # Ad Banner
             f.write('    <div class="ad-banner">Advertisement Space</div>\n')
 
+            # Game listing
             f.write('    <div class="game-container">\n')
-
             if games:
                 for game in games:
                     title = game['title'] if isinstance(game, dict) else game[0]
@@ -63,7 +65,10 @@ def save_to_file(games_by_platform):
                     f.write(f'        <div class="game-item"><a href="{link}">{title}</a></div>\n')
             else:
                 f.write('        <p>No free games available today.</p>\n')
-
             f.write('    </div>\n')
-            f.write('<p><a href="../index.html">Back to main page</a></p>\n')
+            
+            # Footer with Disclaimer
+            f.write('<footer>\n')
+            f.write('    <p>This website is for informational purposes only. The free games listed are subject to availability and changes. Please refer to the respective platforms for the most up-to-date information.</p>\n')
+            f.write('</footer>\n')
             f.write('</body>\n</html>\n')
