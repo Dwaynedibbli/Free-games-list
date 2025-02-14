@@ -68,6 +68,9 @@ def scrape_prime():
             if not has_claim:
                 continue
             if title and link:
+                # If the link is relative, prepend the domain
+                if not link.startswith("http"):
+                    link = "https://gaming.amazon.com" + link
                 valid_games.append({
                     "title": title.strip(),
                     "link": link.strip()
