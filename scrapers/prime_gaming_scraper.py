@@ -1,63 +1,83 @@
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
-import time
+from playwright.sync_api import sync_playwright
 
 def scrape_prime():
-    # Initialize the WebDriver using ChromeDriverManager
-    options = webdriver.ChromeOptions()
-    options.add_argument("--headless")  # Run in headless mode for GitHub Actions
-    options.add_argument("--disable-gpu")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-    driver.get("https://gaming.amazon.com/home")
-    time.sleep(5)  # Allow page to load
-
-    free_games = []
-
-    try:
-        # Handle the cookie banner if it exists
-        try:
-            cookie_banner = driver.find_element(By.CSS_SELECTOR, "div[data-a-target='cookie-policy-banner']")
-            if cookie_banner.is_displayed():
-                close_button = cookie_banner.find_element(By.XPATH, ".//button")
-                close_button.click()
-                time.sleep(2)  # Wait for banner to disappear
-        except Exception as e:
-            print(f"No cookie banner found or unable to close: {e}")
-
-        # Locate the free games tab and click
-        free_games_tab = driver.find_element(By.XPATH, "//p[contains(text(), 'Free games')]")
-        driver.execute_script("arguments[0].scrollIntoView();", free_games_tab)  # Ensure it's visible
-        ActionChains(driver).move_to_element(free_games_tab).click().perform()
-        time.sleep(3)  # Allow time for the games to load
-
-        # Locate all game cards
-        game_cards = driver.find_elements(By.CSS_SELECTOR, "div.item-card-details")
+    with sync_playwright() as p:
+        # Launch Chromium in headless mode
+        browser = p.chromium.launch(headless=True)
+        context = browser.new_context(
+            user_agent=(
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/132.0.0.0 Safari/537.36"
+            )
+        )
+        page = context.new_page()
         
-        for card in game_cards:
-            try:
-                # Extract the title
-                title_element = card.find_element(By.CSS_SELECTOR, "h3.tw-bold")
-                title = title_element.get_attribute("title")
+        # Navigate to the Prime Gaming homepage
+        page.goto("https://gaming.amazon.com/home")
+        page.wait_for_timeout(7000)  # Wait for the page to load
+        
+        # Close the cookie banner if present
+        try:
+            page.click("div[data-a-target='cookie-policy-banner'] button", timeout=5000)
+        except Exception:
+            pass
+        page.wait_for_timeout(3000)
+        
+        # Click the Free Games tab
+        try:
+            page.click(".offer-filters__button__title--Game")
+        except Exception as e:
+            print("Error clicking Free Games tab:", e)
+        page.wait_for_timeout(7000)
+        
+        # Scroll to load all free games
+        scroll_height = page.evaluate("document.body.scrollHeight")
+        attempts = 0
+        max_attempts = 10
+        while attempts < max_attempts:
+            page.keyboard.press("PageDown")
+            page.wait_for_timeout(2000)
+            new_scroll_height = page.evaluate("document.body.scrollHeight")
+            if new_scroll_height > scroll_height:
+                scroll_height = new_scroll_height
+                attempts = 0
+            else:
+                attempts += 1
+        
+        # Select all anchors with free game information
+        anchors = page.query_selector_all("a[data-a-target='learn-more-card']")
+        print("Total learn-more-card anchors found:", len(anchors))
+        
+        valid_games = []
+        for a in anchors:
+            if not a.is_visible():
+                continue
+            title = a.get_attribute("aria-label")
+            link = a.get_attribute("href")
+            # Check that the closest .tw-block contains a claim button with "Claim game"
+            has_claim = a.evaluate(
+                """(el) => {
+                    const block = el.closest('.tw-block');
+                    if (!block) return false;
+                    const claimBtn = block.querySelector('.item-card__claim-button');
+                    if (!claimBtn) return false;
+                    return claimBtn.innerText.toLowerCase().includes("claim game");
+                }"""
+            )
+            if not has_claim:
+                continue
+            if title and link:
+                valid_games.append({
+                    "title": title.strip(),
+                    "link": link.strip()
+                })
+        
+        browser.close()
+        return valid_games
 
-                # Extract the link
-                link_element = card.find_element(By.CSS_SELECTOR, "a[data-a-target='FGWPOffer']")
-                link = link_element.get_attribute("href")
-
-                # Add the game to the list
-                free_games.append({"title": title, "link": link})
-            except Exception as e:
-                print(f"Failed to extract title or link for a game: {e}")
-
-    except Exception as e:
-        print(f"Error navigating to Free Games tab: {e}")
-
-    finally:
-        driver.quit()
-
-    return free_games
+if __name__ == "__main__":
+    games = scrape_prime()
+    print("Total valid free games found:", len(games))
+    for idx, game in enumerate(games, start=1):
+        print(f"{idx}. {game['title']} - {game['link']}")
