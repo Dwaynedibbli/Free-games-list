@@ -8,8 +8,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 import time
-import sys
-import os
 
 def scrape_humble_choice():
     # Configure Chrome options
@@ -47,12 +45,8 @@ def scrape_humble_choice():
                 game_name = title.get_text(strip=True)
                 unique_titles.add(game_name)
 
-        # Prepare data for saving
-        data = [{"title": title, "link": "https://www.humblebundle.com/membership"} for title in unique_titles]
-        #save_data(data, 'humble_choice_games.json')
+        # Return the collected data
+        return [{"title": title, "link": "https://www.humblebundle.com/membership"} for title in unique_titles]
 
     finally:
         driver.quit()
-
-if __name__ == "__main__":
-    scrape_humble_choice()
