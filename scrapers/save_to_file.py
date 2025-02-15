@@ -3,6 +3,12 @@ import os
 def save_to_file(games_by_platform):
     os.makedirs('game_pages', exist_ok=True)
 
+    # AdSense code to be inserted into the head section
+    adsense_code = '''
+    <!-- Google AdSense Code -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3148556674982045" crossorigin="anonymous"></script>
+    '''
+
     # Main Index Page
     with open('index.html', 'w', encoding='utf-8') as f:
         f.write('<!DOCTYPE html>\n')
@@ -11,6 +17,7 @@ def save_to_file(games_by_platform):
         f.write('    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n')
         f.write('    <title>Free Today - Free Games</title>\n')
         f.write('    <link rel="stylesheet" type="text/css" href="styles/style.css">\n')
+        f.write(adsense_code)  # Insert AdSense code here
         f.write('</head>\n<body>\n')
 
         # Header with Logo and Title as a Link
@@ -20,19 +27,6 @@ def save_to_file(games_by_platform):
         f.write('            <h1>Free Today - Free Games</h1>\n')
         f.write('        </a>\n')
         f.write('    </div>\n')
-
-        # Google AdSense Code
-        f.write('    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3148556674982045" crossorigin="anonymous"></script>\n')
-        f.write('    <!-- Horizontal Ads -->\n')
-        f.write('    <ins class="adsbygoogle"\n')
-        f.write('         style="display:block"\n')
-        f.write('         data-ad-client="ca-pub-3148556674982045"\n')
-        f.write('         data-ad-slot="8283377796"\n')
-        f.write('         data-ad-format="auto"\n')
-        f.write('         data-full-width-responsive="true"></ins>\n')
-        f.write('    <script>\n')
-        f.write('         (adsbygoogle = window.adsbygoogle || []).push({});\n')
-        f.write('    </script>\n')
 
         # Platform links
         f.write('    <div class="platform-container">\n')
@@ -53,6 +47,7 @@ def save_to_file(games_by_platform):
             f.write('    <meta charset="UTF-8">\n')
             f.write('    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n')
             f.write('    <link rel="stylesheet" type="text/css" href="../styles/style.css">\n')
+            f.write(adsense_code)  # Insert AdSense code here
             f.write('</head>\n<body>\n')
 
             # Header with Logo and Title as a Link
@@ -62,19 +57,6 @@ def save_to_file(games_by_platform):
             f.write(f'            <h1>{platform} - Free Games</h1>\n')
             f.write('        </a>\n')
             f.write('    </div>\n')
-
-            # Google AdSense Code
-            f.write('    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3148556674982045" crossorigin="anonymous"></script>\n')
-            f.write('    <!-- Horizontal Ads -->\n')
-            f.write('    <ins class="adsbygoogle"\n')
-            f.write('         style="display:block"\n')
-            f.write('         data-ad-client="ca-pub-3148556674982045"\n')
-            f.write('         data-ad-slot="8283377796"\n')
-            f.write('         data-ad-format="auto"\n')
-            f.write('         data-full-width-responsive="true"></ins>\n')
-            f.write('    <script>\n')
-            f.write('         (adsbygoogle = window.adsbygoogle || []).push({});\n')
-            f.write('    </script>\n')
 
             # Game listing
             f.write('    <div class="game-container">\n')
