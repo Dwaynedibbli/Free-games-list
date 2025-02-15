@@ -11,10 +11,6 @@ import time
 import sys
 import os
 
-# Adjust the import path to access utils
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from .save_to_file import save_data
-
 def scrape_humble_choice():
     # Configure Chrome options
     chrome_options = Options()
