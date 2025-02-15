@@ -49,7 +49,7 @@ def scrape_humble_choice():
 
         # Prepare data for saving
         data = [{"title": title, "link": "https://www.humblebundle.com/membership"} for title in unique_titles]
-        save_data(data, 'humble_choice_games.json')
+        #save_data(data, 'humble_choice_games.json')
 
     finally:
         driver.quit()
