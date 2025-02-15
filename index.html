@@ -1,180 +1,28 @@
 <!DOCTYPE html>
-<html ⚡>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Free Today - Free Games</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:400,700&display=swap">
-    <style amp-custom>
-        /* Reset & Global Styles */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            background-color: #121212;
-            color: #ffffff;
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-
-        /* Header Section */
-        .title-container {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            background: linear-gradient(135deg, #24292e, #1e40af);
-            padding: 20px;
-            border-bottom: 4px solid #00adb5;
-            max-width: 100%;
-        }
-
-        /* Logo Positioned to the Left */
-        .logo {
-            width: 60px;
-            height: auto;
-            margin-right: 15px;
-        }
-
-        /* Title Styling */
-        h1 {
-            font-size: 2.5em;
-            font-weight: 700;
-            color: #ffffff;
-            margin: 0;
-        }
-
-        /* Main Page - Platform List */
-        .platform-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-            padding: 40px;
-        }
-
-        /* Platform Cards */
-        .platform-card {
-            background: #20232a;
-            padding: 20px;
-            border-radius: 10px;
-            width: 280px;
-            text-align: center;
-            transition: all 0.3s ease-in-out;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-            border: 2px solid #3b82f6;
-        }
-
-        .platform-card:hover {
-            background: #3b82f6;
-            color: #121212;
-            transform: scale(1.05);
-        }
-
-        .platform-card a {
-            display: block;
-            color: #ffffff;
-            text-decoration: none;
-            font-size: 1.3em;
-            font-weight: bold;
-            padding: 10px;
-        }
-
-        .platform-card a:hover {
-            color: #121212;
-        }
-
-        /* Responsive Design */
-        @media screen and (max-width: 768px) {
-            .title-container {
-                justify-content: center;
-                text-align: center;
-                flex-direction: column;
-            }
-
-            .logo {
-                width: 50px;
-                margin-bottom: 10px;
-            }
-
-            h1 {
-                font-size: 2em;
-            }
-
-            .platform-card {
-                width: 100%;
-            }
-        }
-    </style>
-    <script async custom-element="amp-auto-ads" src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js"></script>
-    <style amp-boilerplate>
-        body {
-            -webkit-animation: -amp-start 8s steps(1,end) 0s 1 normal both;
-            -moz-animation: -amp-start 8s steps(1,end) 0s 1 normal both;
-            -ms-animation: -amp-start 8s steps(1,end) 0s 1 normal both;
-            animation: -amp-start 8s steps(1,end) 0s 1 normal both;
-        }
-        @-webkit-keyframes -amp-start {
-            from {
-                visibility: hidden;
-            }
-            to {
-                visibility: visible;
-            }
-        }
-        @-moz-keyframes -amp-start {
-            from {
-                visibility: hidden;
-            }
-            to {
-                visibility: visible;
-            }
-        }
-        @-ms-keyframes -amp-start {
-            from {
-                visibility: hidden;
-            }
-            to {
-                visibility: visible;
-            }
-        }
-        @keyframes -amp-start {
-            from {
-                visibility: hidden;
-            }
-            to {
-                visibility: visible;
-            }
-        }
-    </style>
-    <noscript>
-        <style amp-boilerplate>
-            body {
-                -webkit-animation: none;
-                -moz-animation: none;
-                -ms-animation: none;
-                animation: none;
-            }
-        </style>
-    </noscript>
+    <link rel="stylesheet" type="text/css" href="styles/style.css">
 </head>
 <body>
-    <amp-auto-ads type="adsense" data-ad-client="ca-pub-3148556674982045"></amp-auto-ads>
-
+    <!-- Header with Logo and Title -->
     <div class="title-container">
-        <amp-img src="styles/logo.png" alt="Logo" class="logo" width="60" height="60"></amp-img>
+        <img src="styles/logo.png" alt="Logo" class="logo">
         <h1>Free Today - Free Games</h1>
     </div>
 
+    <!-- Advertisement Banner -->
+    <div class="ad-banner">Advertisement Space</div>
+
+    <!-- Platform Links -->
     <div class="platform-container">
-        <div class="platform-card"><a href="game_pages/steam.html">Steam (2 games)</a></div>
-        <div class="platform-card"><a href="game_pages/gog.html">GOG (48 games)</a></div>
-        <div class="platform-card"><a href="game_pages/epic.html">Epic (2 games)</a></div>
-        <div class="platform-card"><a href="game_pages/google_play.html">Google Play (6 games)</a></div>
-        <div class="platform-card"><a href="game_pages/prime_gaming.html">Prime Gaming (23 games)</a></div>
+        <div class="platform-card"><a href="game_pages/steam.html">Steam (X games)</a></div>
+        <div class="platform-card"><a href="game_pages/gog.html">GOG (X games)</a></div>
+        <div class="platform-card"><a href="game_pages/epic.html">Epic Games (X games)</a></div>
+        <div class="platform-card"><a href="game_pages/google_play.html">Google Play (X games)</a></div>
+        <div class="platform-card"><a href="game_pages/prime_gaming.html">Prime Gaming (X games)</a></div>
     </div>
 </body>
 </html>
