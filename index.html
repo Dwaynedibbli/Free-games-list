@@ -5,21 +5,76 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Free Today - Free Games</title>
     <link rel="stylesheet" type="text/css" href="styles/style.css">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3148556674982045" crossorigin="anonymous"></script>
 </head>
 <body>
+    <!-- Header with Logo and Title -->
     <div class="title-container">
-        <a href="index.html" style="text-decoration: none; color: inherit;">
-            <img src="styles/logo.png" alt="Logo" class="logo">
-            <h1>Free Today - Free Games</h1>
-        </a>
+        <img src="styles/logo.png" alt="Logo" class="logo">
+        <h1>Free Today - Free Games</h1>
     </div>
-    <div class="ad-banner">Advertisement Space</div>
+
+    <!-- Advertisement Banner -->
+    <div class="ad-banner">
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-3148556674982045"
+             data-ad-slot="8283377796"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+    </div>
+
+    <!-- Platform Links -->
     <div class="platform-container">
-        <div class="platform-card"><a href="game_pages/steam.html">Steam (2 games)</a></div>
-        <div class="platform-card"><a href="game_pages/gog.html">GOG (48 games)</a></div>
-        <div class="platform-card"><a href="game_pages/epic.html">Epic (2 games)</a></div>
-        <div class="platform-card"><a href="game_pages/google_play.html">Google Play (9 games)</a></div>
-        <div class="platform-card"><a href="game_pages/prime_gaming.html">Prime Gaming (34 games)</a></div>
+        <div class="platform-card">
+            <a href="game_pages/steam.html">
+                Steam (<span id="steam-count">X games</span>)
+            </a>
+        </div>
+        <div class="platform-card">
+            <a href="game_pages/gog.html">
+                GOG (<span id="gog-count">X games</span>)
+            </a>
+        </div>
+        <div class="platform-card">
+            <a href="game_pages/epic.html">
+                Epic Games (<span id="epic-count">X games</span>)
+            </a>
+        </div>
+        <div class="platform-card">
+            <a href="game_pages/google_play.html">
+                Google Play (<span id="google-play-count">X games</span>)
+            </a>
+        </div>
+        <div class="platform-card">
+            <a href="game_pages/prime_gaming.html">
+                Prime Gaming (<span id="prime-gaming-count">X games</span>)
+            </a>
+        </div>
     </div>
+
+    <!-- Custom JavaScript to Update Game Counts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fetch game counts from the server or define them directly
+            const gameCounts = {
+                steam: 5,
+                gog: 3,
+                epic: 4,
+                google_play: 2,
+                prime_gaming: 6
+            };
+
+            // Update the HTML elements with the actual game counts
+            document.getElementById('steam-count').textContent = `${gameCounts.steam} games`;
+            document.getElementById('gog-count').textContent = `${gameCounts.gog} games`;
+            document.getElementById('epic-count').textContent = `${gameCounts.epic} games`;
+            document.getElementById('google-play-count').textContent = `${gameCounts.google_play} games`;
+            document.getElementById('prime-gaming-count').textContent = `${gameCounts.prime_gaming} games`;
+        });
+    </script>
 </body>
 </html>
