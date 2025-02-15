@@ -13,7 +13,7 @@ import os
 
 # Adjust the import path to access utils
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from utils.save_to_file import save_data
+from .save_to_file import save_data
 
 def scrape_humble_choice():
     # Configure Chrome options
