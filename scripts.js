@@ -13,6 +13,8 @@ function updateGameCounts(data) {
     document.getElementById("epic-count").innerText = data["Epic"] ? data["Epic"].length : 0;
     document.getElementById("google-count").innerText = data["Google Play"] ? data["Google Play"].length : 0;
     document.getElementById("prime-count").innerText = data["Prime Gaming"] ? data["Prime Gaming"].length : 0;
+    document.getElementById("humble-choice-count").innerText = data["Humble Choice"] ? data["Humble Choice"].length : 0;
+
 }
 
 function showGames(platform) {
