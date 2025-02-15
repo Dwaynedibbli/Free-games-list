@@ -39,21 +39,6 @@ h1 {
     margin: 0;
 }
 
-/* Ad Banner Placement */
-.ad-banner {
-    background: #2d3748;
-    color: #ffffff;
-    width: 90%;
-    max-width: 728px;
-    margin: 20px auto;
-    padding: 15px;
-    border-radius: 8px;
-    text-align: center;
-    font-size: 1.2em;
-    font-weight: bold;
-    border: 2px dashed #00adb5;
-}
-
 /* Main Page - Platform List */
 .platform-container {
     display: flex;
