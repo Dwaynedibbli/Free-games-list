@@ -21,8 +21,18 @@ def save_to_file(games_by_platform):
         f.write('        </a>\n')
         f.write('    </div>\n')
 
-        # Ad Banner
-        f.write('    <div class="ad-banner">Advertisement Space</div>\n')
+        # Google AdSense Code
+        f.write('    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3148556674982045" crossorigin="anonymous"></script>\n')
+        f.write('    <!-- Horizontal Ads -->\n')
+        f.write('    <ins class="adsbygoogle"\n')
+        f.write('         style="display:block"\n')
+        f.write('         data-ad-client="ca-pub-3148556674982045"\n')
+        f.write('         data-ad-slot="8283377796"\n')
+        f.write('         data-ad-format="auto"\n')
+        f.write('         data-full-width-responsive="true"></ins>\n')
+        f.write('    <script>\n')
+        f.write('         (adsbygoogle = window.adsbygoogle || []).push({});\n')
+        f.write('    </script>\n')
 
         # Platform links
         f.write('    <div class="platform-container">\n')
@@ -53,8 +63,18 @@ def save_to_file(games_by_platform):
             f.write('        </a>\n')
             f.write('    </div>\n')
 
-            # Ad Banner
-            f.write('    <div class="ad-banner">Advertisement Space</div>\n')
+            # Google AdSense Code
+            f.write('    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3148556674982045" crossorigin="anonymous"></script>\n')
+            f.write('    <!-- Horizontal Ads -->\n')
+            f.write('    <ins class="adsbygoogle"\n')
+            f.write('         style="display:block"\n')
+            f.write('         data-ad-client="ca-pub-3148556674982045"\n')
+            f.write('         data-ad-slot="8283377796"\n')
+            f.write('         data-ad-format="auto"\n')
+            f.write('         data-full-width-responsive="true"></ins>\n')
+            f.write('    <script>\n')
+            f.write('         (adsbygoogle = window.adsbygoogle || []).push({});\n')
+            f.write('    </script>\n')
 
             # Game listing
             f.write('    <div class="game-container">\n')
