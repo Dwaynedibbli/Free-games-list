@@ -1,4 +1,5 @@
 from playwright.sync_api import sync_playwright
+import re  # NEW
 
 def scrape_prime():
     with sync_playwright() as p:
@@ -55,6 +56,19 @@ def scrape_prime():
                 continue
             title = a.get_attribute("aria-label")
             link = a.get_attribute("href")
+
+            # Skip if no link at all
+            if not link:
+                continue
+
+            # 🔧 NEW: normalize old-style Prime "claims" URLs:
+            # "/claims/gunslugs-gog/dp/..."  ->  "/gunslugs-gog/dp/..."
+            link = re.sub(r'/claims/(?=[^/]+/dp/)', '/', link)
+
+            # If the link is relative, prepend the domain
+            if not link.startswith("http"):
+                link = "https://gaming.amazon.com" + link
+
             # Check that the closest .tw-block contains a claim button with "Claim game"
             has_claim = a.evaluate(
                 """(el) => {
@@ -67,10 +81,8 @@ def scrape_prime():
             )
             if not has_claim:
                 continue
+
             if title and link:
-                # If the link is relative, prepend the domain
-                if not link.startswith("http"):
-                    link = "https://gaming.amazon.com" + link
                 valid_games.append({
                     "title": title.strip(),
                     "link": link.strip()
