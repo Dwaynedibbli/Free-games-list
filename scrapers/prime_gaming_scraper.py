@@ -1,9 +1,7 @@
 from playwright.sync_api import sync_playwright
-import re  # NEW
 
 def scrape_prime():
     with sync_playwright() as p:
-        # Launch Chromium in headless mode
         browser = p.chromium.launch(headless=True)
         context = browser.new_context(
             user_agent=(
@@ -14,25 +12,21 @@ def scrape_prime():
         )
         page = context.new_page()
         
-        # Navigate to the Prime Gaming homepage
         page.goto("https://gaming.amazon.com/home")
-        page.wait_for_timeout(7000)  # Wait for the page to load
+        page.wait_for_timeout(7000)
         
-        # Close the cookie banner if present
         try:
             page.click("div[data-a-target='cookie-policy-banner'] button", timeout=5000)
         except Exception:
             pass
         page.wait_for_timeout(3000)
         
-        # Click the Free Games tab
         try:
             page.click(".offer-filters__button__title--Game")
         except Exception as e:
             print("Error clicking Free Games tab:", e)
         page.wait_for_timeout(7000)
         
-        # Scroll to load all free games
         scroll_height = page.evaluate("document.body.scrollHeight")
         attempts = 0
         max_attempts = 10
@@ -46,7 +40,6 @@ def scrape_prime():
             else:
                 attempts += 1
         
-        # Select all anchors with free game information
         anchors = page.query_selector_all("a[data-a-target='learn-more-card']")
         print("Total learn-more-card anchors found:", len(anchors))
         
@@ -54,22 +47,22 @@ def scrape_prime():
         for a in anchors:
             if not a.is_visible():
                 continue
+
             title = a.get_attribute("aria-label")
             link = a.get_attribute("href")
 
-            # Skip if no link at all
             if not link:
                 continue
 
-            # 🔧 NEW: normalize old-style Prime "claims" URLs:
-            # "/claims/gunslugs-gog/dp/..."  ->  "/gunslugs-gog/dp/..."
-            link = re.sub(r'/claims/(?=[^/]+/dp/)', '/', link)
+            # 🔧 ALWAYS normalize claims URLs (absolute or relative)
+            # e.g. "/claims/gunslugs-gog/dp/..." -> "/gunslugs-gog/dp/..."
+            #      "https://gaming.amazon.com/claims/..." -> "https://gaming.amazon.com/..."
+            link = link.replace("/claims/", "/")
 
             # If the link is relative, prepend the domain
             if not link.startswith("http"):
                 link = "https://gaming.amazon.com" + link
 
-            # Check that the closest .tw-block contains a claim button with "Claim game"
             has_claim = a.evaluate(
                 """(el) => {
                     const block = el.closest('.tw-block');
