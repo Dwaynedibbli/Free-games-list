@@ -1,84 +1,51 @@
-import re  # <-- Added for post-processing
-
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from webdriver_manager.chrome import ChromeDriverManager
-import time
+
 
 def scrape_epic():
-    # Set up Chrome options to run headlessly
     chrome_options = Options()
-    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--headless=new")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--window-size=1920,1080")
-    chrome_options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                               "AppleWebKit/537.36 (KHTML, like Gecko) "
-                               "Chrome/85.0.4183.121 Safari/537.36")
 
-    # Set up the Chrome WebDriver with the options
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
-
-    # Open the Epic Games Store Free Games page
-    driver.get("https://store.epicgames.com/en-US/free-games")
-
-    # Wait for the page to load
+    driver = webdriver.Chrome(
+        service=Service(ChromeDriverManager().install()),
+        options=chrome_options,
+    )
     free_games = []
     try:
-        # Wait until the elements with the game class are present
-        WebDriverWait(driver, 20).until(
-            EC.presence_of_element_located((By.XPATH, '//span[contains(text(), "Free Now")]'))
+        driver.get("https://store.epicgames.com/en-US/free-games")
+        selector = 'a[data-discover="true"][aria-label*="Free Now"]'
+        WebDriverWait(driver, 30).until(
+            lambda d: len(d.find_elements(By.CSS_SELECTOR, selector)) > 0
         )
 
-        # Add sleep to ensure the content is loaded
-        time.sleep(5)
-
-        # Find all free game elements by the visible "Free Now" button
-        games = driver.find_elements(By.XPATH, '//span[contains(text(), "Free Now")]/ancestor::a')
-
-        # Loop through the games and extract title and link
-        for game in games:
+        seen = set()
+        for game in driver.find_elements(By.CSS_SELECTOR, selector):
             try:
-                title = game.text.strip()  # Raw title text
-
-                # 1. Remove "Free Now" (case-insensitive)
-                title = re.sub(r'(?i)free now', '', title)
-                # 2. Remove everything from the first dash onward (e.g., date/time)
-                title = re.sub(r'-.*', '', title)
-                # 3. Normalize whitespace
-                title = re.sub(r'\s+', ' ', title).strip()
-
-                link = game.get_attribute('href')
-
-                free_games.append({
-                    'title': title,
-                    'link': link
-                })
-            except Exception as e:
-                print(f"Error processing a game: {e}")
-
-        # Print the extracted free games for debugging
-        if free_games:
-            for game in free_games:
-                print(f"Title: {game['title']}, Link: {game['link']}")
-        else:
-            print("No free games found.")
-
+                title = game.find_element(By.CSS_SELECTOR, "h2").text.strip()
+                link = game.get_attribute("href")
+                if not title or not link or link in seen:
+                    continue
+                seen.add(link)
+                free_games.append({"title": title, "link": link})
+                print(f"Epic: {title} - {link}")
+            except Exception as exc:
+                print(f"Could not parse an Epic game: {exc}")
     except TimeoutException:
-        print("Page took too long to load or elements were not found.")
-    except Exception as e:
-        print(f"An error occurred: {e}")
+        print("Epic: timed out waiting for 'Free Now' game links; page structure or loading may have changed.")
     finally:
-        # Close the browser
         driver.quit()
 
+    print(f"Epic: found {len(free_games)} free-now games")
     return free_games
 
-# Run the scraper
+
 if __name__ == "__main__":
     scrape_epic()
