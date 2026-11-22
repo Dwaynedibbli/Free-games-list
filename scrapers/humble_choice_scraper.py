@@ -1,52 +1,71 @@
 # scrapers/humble_choice_scraper.py
-
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from bs4 import BeautifulSoup
-import time
+from selenium.common.exceptions import TimeoutException
+
+URL = "https://www.humblebundle.com/membership"
+
 
 def scrape_humble_choice():
-    # Configure Chrome options
-    chrome_options = Options()
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--disable-gpu")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")
+    options = Options()
+    options.add_argument("--headless=new")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--window-size=1920,1080")
 
-    # Set up the WebDriver
-    service = Service()
-    driver = webdriver.Chrome(service=service, options=chrome_options)
+    driver = webdriver.Chrome(options=options)
+    games = []
+    seen = set()
 
     try:
-        driver.get("https://www.humblebundle.com/membership")
-        WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CLASS_NAME, "js-discover-game-slide"))
-        )
+        driver.get(URL)
+        wait = WebDriverWait(driver, 25)
+        carousel = wait.until(lambda d: d.find_element(
+            By.CSS_SELECTOR, '[role="region"][aria-label="carousel"][data-choice-count]'
+        ))
+        expected = int(carousel.get_attribute("data-choice-count") or "0")
+        print(f"Humble Choice reports {expected} games")
 
-        game_carousel = driver.find_element(By.CLASS_NAME, "discover-games")
-        games = game_carousel.find_elements(By.CLASS_NAME, "js-discover-game-slide")
+        # The carousel may render only four thumbnails at a time.
+        # Selecting Next causes the visible buttons to update.
+        max_steps = max(expected * 2, 12) if expected else 30
+        for _ in range(max_steps):
+            carousel = driver.find_element(
+                By.CSS_SELECTOR, '[role="region"][aria-label="carousel"][data-choice-count]'
+            )
+            buttons = carousel.find_elements(By.CSS_SELECTOR, 'button[aria-label]')
+            for button in buttons:
+                title = (button.get_attribute("aria-label") or "").strip()
+                if title and title not in seen:
+                    seen.add(title)
+                    games.append({"title": title, "link": URL})
+                    print(f"Humble Choice: {title}")
+            if expected and len(games) >= expected:
+                break
 
-        for game in games:
-            driver.execute_script("arguments[0].scrollIntoView();", game)
-            time.sleep(1)
+            next_button = carousel.find_element(
+                By.XPATH, './/button[.//span[normalize-space()="Next slide"]]'
+            )
+            before = tuple((b.get_attribute("aria-label") or "") for b in buttons)
+            driver.execute_script("arguments[0].click();", next_button)
+            try:
+                wait.until(lambda d: tuple(
+                    b.get_attribute("aria-label") or "" for b in
+                    d.find_element(By.CSS_SELECTOR, '[role="region"][aria-label="carousel"][data-choice-count]')
+                     .find_elements(By.CSS_SELECTOR, 'button[aria-label]')
+                ) != before)
+            except TimeoutException:
+                print("Carousel did not advance; stopping")
+                break
 
-        page_source = driver.page_source
-        soup = BeautifulSoup(page_source, "html.parser")
-        game_titles = soup.find_all("div", class_="js-discover-game-slide")
-
-        unique_titles = set()
-        for game in game_titles:
-            title = game.find("div", class_="human-name")
-            if title:
-                game_name = title.get_text(strip=True)
-                unique_titles.add(game_name)
-
-        # Return the collected data
-        return [{"title": title, "link": "https://www.humblebundle.com/membership"} for title in unique_titles]
-
+        print(f"Collected {len(games)} Humble Choice games")
+        return games
     finally:
         driver.quit()
+
+
+if __name__ == "__main__":
+    print(scrape_humble_choice())
