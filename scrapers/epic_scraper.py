@@ -1,60 +1,85 @@
-from urllib.parse import urljoin
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import TimeoutException
-from webdriver_manager.chrome import ChromeDriverManager
+"""Epic Games Store limited-time giveaways (not permanently free games)."""
+from datetime import datetime, timezone
+from urllib.parse import quote
+import requests
 
-URL = 'https://store.epicgames.com/en-US/free-games'
+API_URL = "https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions"
+STORE_URL = "https://store.epicgames.com/en-US"
+
+
+def _active_giveaway(element, now):
+    promotions = (element.get("promotions") or {}).get("promotionalOffers") or []
+    for group in promotions:
+        for offer in group.get("promotionalOffers") or []:
+            discount = offer.get("discountSetting") or {}
+            if discount.get("discountPercentage") != 0:
+                continue
+            try:
+                start = datetime.fromisoformat(offer["startDate"].replace("Z", "+00:00"))
+                end = datetime.fromisoformat(offer["endDate"].replace("Z", "+00:00"))
+            except (KeyError, TypeError, ValueError):
+                continue
+            if start <= now < end:
+                return True
+    return False
+
+
+def _store_link(element):
+    mappings = element.get("catalogNs", {}).get("mappings") or []
+    mappings += element.get("offerMappings") or []
+    slugs = [m.get("pageSlug") for m in mappings if m.get("pageSlug")]
+    if element.get("productSlug"):
+        slugs.append(element["productSlug"])
+    for slug in slugs:
+        slug = slug.strip("/")
+        if not slug:
+            continue
+        if slug.startswith(("http://", "https://")):
+            return slug
+        if slug.startswith(("p/", "bundles/")):
+            return f"{STORE_URL}/{slug}"
+        if slug.startswith("home/"):
+            continue
+        return f"{STORE_URL}/p/{slug}"
+    return None
+
 
 def scrape_epic():
-    options = Options()
-    options.add_argument('--headless=new')
-    options.add_argument('--no-sandbox')
-    options.add_argument('--disable-dev-shm-usage')
-    options.add_argument('--window-size=1920,1080')
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-    games = []
     try:
-        driver.get(URL)
-        print('Epic URL:', driver.current_url)
-        print('Epic title:', driver.title)
-        section = WebDriverWait(driver, 45).until(
-            lambda d: d.find_element(By.CSS_SELECTOR, 'section[aria-labelledby="free-games-heading"]')
+        response = requests.get(
+            API_URL,
+            params={"locale": "en-US", "country": "US", "allowCountries": "US"},
+            headers={"User-Agent": "Mozilla/5.0", "Accept": "application/json"},
+            timeout=30,
         )
-        WebDriverWait(driver, 20).until(
-            lambda d: section.find_elements(By.CSS_SELECTOR, 'ul li a[href][aria-label]')
-        )
-        cards = section.find_elements(By.CSS_SELECTOR, 'ul li')
-        print('Epic free-game section cards:', len(cards))
-        seen = set()
-        for card in cards:
-            try:
-                anchor = card.find_element(By.CSS_SELECTOR, 'a[href][aria-label]')
-                label = anchor.get_attribute('aria-label') or ''
-                status = card.find_element(By.CSS_SELECTOR, 'p[aria-hidden="true"]').text.strip()
-                print('Epic candidate:', label, '| status:', status)
-                if not status.lower().startswith('free now'):
-                    continue
-                title = anchor.find_element(By.CSS_SELECTOR, 'h2').get_attribute('textContent').strip()
-                link = urljoin('https://store.epicgames.com', anchor.get_attribute('href'))
-                if title and link not in seen:
-                    seen.add(link)
-                    games.append({'title': title, 'link': link})
-            except Exception as exc:
-                print('Epic card skipped:', type(exc).__name__, str(exc)[:200])
-    except TimeoutException:
-        print('Epic ERROR: free-game section did not load in time')
-        print('Current URL:', driver.current_url)
-        print('Page title:', driver.title)
-        print('HTML contains free-games-heading:', 'free-games-heading' in driver.page_source)
-        print('HTML contains Free Now:', 'Free Now' in driver.page_source)
-    finally:
-        driver.quit()
-    print('Epic games found:', games)
+        response.raise_for_status()
+        payload = response.json()
+        elements = payload["data"]["Catalog"]["searchStore"]["elements"]
+    except (requests.RequestException, ValueError, KeyError, TypeError) as exc:
+        print(f"Epic API error: {exc}")
+        return []
+
+    now = datetime.now(timezone.utc)
+    games = []
+    seen = set()
+    for element in elements:
+        title = element.get("title")
+        price = ((element.get("price") or {}).get("totalPrice") or {})
+        original = price.get("originalPrice")
+        current = price.get("discountPrice")
+        if not title or not isinstance(original, (int, float)) or original <= 0:
+            continue  # Exclude permanently free / freemium titles
+        if current != 0 or not _active_giveaway(element, now):
+            continue
+        link = _store_link(element)
+        if not link or link in seen:
+            continue
+        seen.add(link)
+        games.append({"title": title, "link": link})
+        print(f"Epic giveaway: {title} | {link}")
+    print(f"Epic giveaways found: {len(games)} (API entries: {len(elements)})")
     return games
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     scrape_epic()
